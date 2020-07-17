@@ -1,0 +1,14 @@
+var mapper = "app/config/nebula-2.0/dataTransformation"
+
+var deviceDataTopUp =  {
+    "lat": 45.5602805, 
+    "long": -73.8521324,
+    "address": "Freedom Tower",
+    "city": "Montreal",
+    "country": "Canada",
+    "locationType": "Industrial",
+    "locationSection": "kitchen",
+    "physicalEnvironment": "Fridge",
+    "sensor": "nebula-2.0",
+    "source": "simulator"
+}

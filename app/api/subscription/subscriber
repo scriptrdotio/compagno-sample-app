@@ -1,0 +1,83 @@
+var log = require("log"); 
+log.setLevel("info");
+
+var devices = require("device");
+var utils = require("app/entities/utils");
+
+var _ = require("modules/underscore/underscore.js")._;
+
+var deviceManager = require("app/entities/deviceManager");
+var deviceEvaluator = require("app/entities/deviceEvaluator");
+var devicePublisher = require("app/entities/devicePublisher");
+
+var config = require("app/config/config");
+
+var deviceConfig = null;
+var data = {};
+var deviceId = null;
+var dataMapping = {};
+log.info("[app/api/subscription/subscriber] received the following payload \n" + JSON.stringify(request));
+
+var body = request.body ? request.body : ((request.rawBody) ? request.rawBody : request.parameters);
+var inputData = typeof(body) == "string" ? JSON.parse(body) : body;
+
+_.some(config.availableDeviceTypes, function(entry) {
+    deviceConfig = entry;
+    var deviceMapper = require(entry.mapper);
+    data = deviceMapper.mapIt(inputData); 
+    data = _.omit(data, function(value, key, object) {
+        return _.isUndefined(value);
+    });
+    return (_.isEmpty(data) == false);
+});
+if(data.id) {//If it is in payload
+    deviceId = data.id; 
+} else if(request.user.id != config.dmpDeviceBroker) {//If it is NOT in payload, the device is identified by the call credentials
+    deviceId = request.user.id;
+} else {
+    log.info("[app/api/subscription/subscriber] Unable to identify device. Neither id in payload nor a valid device token.\n" + JSON.stringify(data));
+    return;
+}
+
+
+
+log.info("[app/api/subscription/subscriber] transform the payload into \n" + JSON.stringify(data));
+
+if(!_.isEmpty(data)) { 
+    try {
+        var deviceDefinition = deviceManager.getDeviceDefinition(deviceId);
+        log.info("Existing Device Definition: "+JSON.stringify(deviceDefinition))
+        if(deviceDefinition == null) {
+            var deviceDefinition = {};
+            
+            _.extend(deviceConfig.deviceDataTopUp, utils.randomGeo({"lat": deviceConfig.deviceDataTopUp.lat, "lng": deviceConfig.deviceDataTopUp.long}, 2000));
+            
+            deviceDefinition = _.extend(deviceConfig.deviceDataTopUp, data);
+            deviceDefinition.id = deviceDefinition.name = deviceId;
+            deviceDefinition = deviceManager.buildDeviceDefinitionDocument(deviceDefinition);
+            //Save device definition
+            log.info("[app/api/subscription/subscriber] Creating Device Definition: "+JSON.stringify(deviceDefinition))
+            var result = deviceManager.saveDeviceDefinition(deviceDefinition);
+        }
+        var entry = {};
+        entry = deviceManager.buildDeviceEventDocument(deviceDefinition, data);
+        log.info("[app/api/subscription/subscriber] Processing Event Entry: " + JSON.stringify(entry))	
+        return processEntry(entry);
+    }catch(exception) {
+        log.info("Exception: "+JSON.stringify(exception))
+        return exception;    
+    }
+} else {
+    log.info("[app/api/subscription/subscriber] No transformation found for data");
+    return;
+}
+
+
+function processEntry(entry) {
+    deviceEvaluator.evaluateDevice(entry)
+    deviceManager.saveDeviceEvent(entry);
+    devicePublisher.publishDevice(entry);
+}
+
+
+

@@ -1,0 +1,159 @@
+var log = require("log"); 
+log.setLevel("info");
+var deviceManager = require("app/entities/deviceManager");
+var document = require("document");
+var _ = require("modules/underscore/underscore.js")._;
+var moment = require("modules/momentjs/moment.min.js").moment;
+/**  
+	* The dashboard builder will send data in the following format
+	* Over HTTP / Get Methos
+        {
+        "format": [
+          "dygraphs"
+        ],
+        "query": [
+          "{\"sensor\":[\"temperature\",\"humidity\"],\"device\":\"myDevice2\"}",
+          "{\"sensor\":[\"temperature\",\"humidity\"],\"device\":\"myDevice\"}"
+        ]
+      }
+    * Over wss
+    	{
+            "body": [
+              "{\"query\":[{\"sensor\":[\"temperature\",\"humidity\"],\"device\":\"myDevice2\"},{\"sensor\":	
+                        [\"temperature\",\"humidity\"],\"device\":\"myDevice\"}],\"format\":\"dygraphs\"}"
+            ]
+          }
+**/
+var body = request.body ? request.body : ((request.rawBody) ? request.rawBody : ((request.parameters.body) ? request.parameters.body :request.parameters));
+var params = typeof(body) == "string" ? JSON.parse(body) : body;
+/** 
+	* At this stage the query params has 1 of these 2 formats
+    * HTTP /GET
+        {
+          "query": [
+            "{\"sensor\":[\"temperature\",\"humidity\"],\"device\":\"myDevice2\"}",
+            "{\"sensor\":[\"temperature\",\"humidity\"],\"device\":\"myDevice\"}"
+          ],
+          "format": "dygraphs"
+        }
+     * WSS
+          {
+            "query": [
+              {
+                "sensor": [
+                  "temperature",
+                  "humidity"
+                ],
+                "device": "myDevice2"
+              },
+              {
+                "sensor": [
+                  "temperature",
+                  "humidity"
+                ],
+                "device": "myDevice"
+              }
+            ],
+            "format": "dygraphs"
+          }  
+**/
+var query = params.query;
+var format = params.format;
+if(typeof query == "string") query = [params.query]
+//Get the devices and the attributes we are querying for
+var devices = [];
+var sensors = ["id", "creationDate"];
+var keys = [];
+var keysOrder = [];
+_.forEach(query, function(entry){
+    log.info("entry "+JSON.stringify(entry))
+   	var tmp = typeof(entry) == "string" ? JSON.parse(entry) : entry;
+    if(devices.indexOf(tmp.device) == -1) {
+        devices.push(tmp.device);
+    }
+    sensors = _.union(sensors,tmp.sensor);
+    _.forEach(tmp.sensor, function(sensor){
+   		 keysOrder.push(tmp.device+"-"+sensor);
+    })
+})
+devices = _.uniq(devices);
+sensors = _.uniq(sensors);
+log.info("Legend Keys: "+JSON.stringify(keysOrder))
+var result = deviceManager.getDevicesHistoricalSensorsEntries(devices, sensors);
+if(format == "grid") {
+    return result;
+}
+var data = result.documents;
+if(format == "dygraphs") {
+    var formattedData = [];
+    _.each(data, function(entry){
+        var tmp = [];
+        tmp.push(moment(entry["creationDate"]).startOf('minute').valueOf()) //Round to start of minute
+        _.each(keysOrder, function(dkoEntry){
+             var deviceId = entry["id"]
+             var found = _.some(entry, function(value, key){
+                 if(deviceId+"-"+key == dkoEntry) {
+                     tmp.push(parseFloat(value));
+                     return true;
+                 } 
+            });
+            if(!found) {
+                tmp.push(null);
+            }
+     	});
+        formattedData.push(tmp);
+	});
+   return formattedData;
+}
+if(format == "line" || format == "area" || format == "bar") {
+   var formattedData = [];
+    _.each(data, function(entry){
+        var tmp = {};
+        tmp["creationDate"] = moment(entry["creationDate"]).startOf('minute').valueOf() //Round to start of minute
+        _.each(keysOrder, function(dkoEntry){
+             var deviceId = entry["id"]
+             var found = _.some(entry, function(value, key){
+                 if(deviceId+"-"+key == dkoEntry) {
+                     tmp[dkoEntry] = parseFloat(value);
+                     return true;
+                 } 
+            });
+     	});
+        formattedData.push(tmp);
+	});
+   return formattedData;
+}
+return data;
+//var sensorKeys =  JSON.parse(sensors);
+if(format == "windrose") {
+    var windrose = [];
+    var data = _.groupBy(_.filter(devices, function(element){return element["direction"] != null && element["speed"] != null }), "direction");
+    var keys = _.keys(data);
+    _.each(keys, function(key){
+        windrose.push(
+            {
+                "direction": key, 
+                "speeds": _.pluck(data[key], "speed")
+            });
+    });
+    return windrose;
+}
+if(format == "d3surface") {
+    var surface = {}
+    _.each(devices, function(entry){
+        var keys = _.keys(entry);
+        _.each(keys, function(key){
+            if(sensorKeys.indexOf(key) > -1 && key !== "creationDate"){
+                if(surface[key] != undefined && surface[key] != null) {
+                    surface[key].push(entry[key])
+                } else {
+                    surface[key] = [entry[key]]
+                }
+            }
+        })
+    });
+    return surface;
+}
+if(format == "donut") {
+}
+return devices;

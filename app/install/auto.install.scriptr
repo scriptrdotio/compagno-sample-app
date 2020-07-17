@@ -1,0 +1,142 @@
+var responseObject = {};
+var channels = require("channel");
+var devices = require("device");
+var users = require("user");
+var groups = require("group");
+
+
+/** Setup account default domain if none is set **/
+var subdomain = request.account.accountKey;
+var params = {
+    "apsdb.name": subdomain
+}
+
+var step = apsdb.callApi("SaveSubdomain", params, null); 
+responseObject["subdomainCreation_"+subdomain] = JSON.stringify(step)
+
+var configurationSettings = {"apsdb.optionalBindReferrer": "true"};
+responseObject["savingConfiguration"] = apsdb.callApi("SaveConfiguration", configurationSettings, null)
+
+/** Create a group editor that allows its users to access the scriptr ide plugins, ex: decision table **/
+var editorGroup = "editor";
+var step2 = groups.create(editorGroup);
+responseObject["groupCreation_"+editorGroup] = JSON.stringify(step2);
+
+/** Create a group admin that allows its users to access admin stuff **/
+var adminGroup = "admin";
+var step3 = groups.create(adminGroup);
+responseObject["groupCreation_"+adminGroup] = JSON.stringify(step3);
+
+/** Create Anonymous publish channel used to receive requests from browser **/
+var channelsList =  ["requestChannel", "responseChannel"];
+var options = {
+  "subscribeACL": "anonymous",
+  "publishACL": "anonymous"
+}
+
+channelsList.forEach(function(channel) {
+   var step5 = channels.create(channel, options);
+   responseObject["channelCreation_"+channel] = JSON.stringify(step5)
+});
+
+
+var defaultDevice = { //This device is used by to authenticate a single device
+    "id":"myDevice",
+    "password" : "demo",
+    "name" : "myDevice",
+    "type": "hardware",
+    "lat": 45.6307159, 
+    "long": -73.9373892,
+    "address": "Little Feet Meadow",
+    "city": "Montreal",
+    "country": "Canada",
+    "locationType": "Ranch",
+    "locationSection": "Neck Collar",
+    "physicalEnvironment": "Cow",
+    "sensor": "mySensorType",
+    "source": "simulator"
+}
+
+var devicesList = [
+    { //This device is used by to authenticate the messaging of group of devices to scriptr example, used for the authentication with the mqtt bridge, or to add the messaging queue
+        "id":"myDmpBroker",
+        "password" : "demo",
+        "name" : "myDmpBroker"
+    },
+    defaultDevice
+];
+
+devicesList.forEach(function(params) {
+   	var step6= devices.save(params);
+    responseObject["deviceCreation_"+params.id] = JSON.stringify(step6);
+
+    var step7= devices.generateToken(params.id);
+    responseObject["deviceToken_"+params.id] = JSON.stringify(step7);
+});
+
+
+//create users to be used to login to the app
+var usersList = [
+    {//Device used to login to iot app
+        "id":"demo",
+        "password" : "demo",
+        "name" : "demo",
+        "groups": []
+    },
+    {//Device used to login to iot app
+        "id":"admin",
+        "password" : "admin",
+        "name" : "admin",
+        "groups": ["editor","admin"]
+    }
+
+];
+
+usersList.forEach(function(params) {
+  var step8= users.save(params);
+  var step9=users.generateToken(params.id, {"password": params.password, "expiry": 1800, "lifeTime": 7200, "bindToReferrer": "false"});
+  responseObject["userCreation_"+params.id] = JSON.stringify(step8);
+  responseObject["userTokenCreation_"+params.id] = JSON.stringify(step9);
+
+});
+
+
+//Create the channel used by the mqtt bridge between scriptr and ibm bluemix
+var channelsList =  ["deviceDigest"];
+var params = {"name" : "deviceDigest", "subscribeACL": ["authenticated"],"publishACL":  ["authenticated"]};
+var step10 = apsdb.callApi("SaveChannel", params , null )
+responseObject["channelCreation_"+params.name] = JSON.stringify(step10);
+
+//Setup the mqtt connection instance (ibm free tier)
+var params = {
+    'name': 'deviceDigestEndpoint',
+    'protocol': 'mqtt',
+    'url':'quickstart.messaging.internetofthings.ibmcloud.com',
+    'topic': 'iot-2/type/sensors/id/device'+request.account.accountKey+'/evt/+/fmt/json',
+    'clientId': 'a:quickstart:scriptr-'+request.account.accountKey
+    
+}
+var response = apsdb.callApi("SaveExternalEndpointConfiguration", params, null);
+responseObject["createMqttExternalEndPoint"] = JSON.stringify(response);
+
+
+//Link the bridge to the channel for publishing messages
+//The free trial if not activated yet can be activated by going to channels and clicking on bridges under any channel and clicking on free trial button
+var params = {
+    "channel": "deviceDigest",
+    "externalEndpointConfiguration":"deviceDigestEndpoint",
+    "auth_token": devices.get("myDmpBroker").result["auth_token"]
+}
+var response = apsdb.callApi("AddBridge", params, null);
+responseObject["AddBridge"] = JSON.stringify(response);
+
+var pubsub = require("pubsub");
+var topic = pubsub.getInstance("deviceDigest");
+var response = topic.subscribe("app/api/subscription/subscriber", "script");
+responseObject["subscribeScriptToChannel"] = JSON.stringify(response);
+
+//Set a scheduler to cleanup events
+var scheduleCleanup = schedule("app/cleanup/devicesEvents", "5 * * * ?");
+responseObject["scheduleCleanup"] = JSON.stringify(scheduleCleanup);
+
+return responseObject;
