@@ -40,6 +40,38 @@ var templates = {
       PROXIMITY_ALERT: {
           subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Proximity Alert!',
           body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has flagged a proximity alert with value <%= proximity %>.'
+      },
+      HIGH_PRESSURE: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Pressure!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high pressure of <%= pressure %>.'
+      },
+      LOW_PRESSURE: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Pressure!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low pressure of <%= pressure %>.'
+      },
+      HIGH_CO2: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High CO2 Level!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high co2 level of <%= co2 %>.'
+      },
+      LOW_CO2: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low CO2 Level! ',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low co2 level of <%= co2 %>.'
+      },
+      HIGH_TVOC: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High TVOC Level!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high tvoc level of <%= tvoc %>.'
+      },
+      LOW_TVOC: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low TVOC Level!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low tvoc level of <%= tvoc %>.'
+      },
+      HIGH_PARTICLE: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Particle Level!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high particle level of <%= particle %>.'
+      },
+      LOW_PARTICLE: {
+          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Particle Level!',
+          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low particle level of <%= particle %>.'
       }
   }
 }
