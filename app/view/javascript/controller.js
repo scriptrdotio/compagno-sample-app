@@ -454,6 +454,15 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
             ],
             "format": 'dygraphs'
         };
+        vm.grideyeParams = {
+            "query": [
+                {
+                    "sensor": ['temperature_list'],
+                    "device": vm.deviceKey
+                }
+            ],
+            "format": "grideye"
+        };
     }
 
 
@@ -574,7 +583,11 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
     }
     
     vm.grideyeFormatData = function(data){
-        return JSON.format(data.latest.temperature_list);
+        if(data instanceof Array){
+            return JSON.parse(data[data.length - 1].temperature_list);;
+        }else{
+            return JSON.parse(data.latest.temperature_list);
+        }
     }
 
     vm.historicalFormatData = function(data){

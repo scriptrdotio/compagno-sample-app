@@ -46,7 +46,8 @@ var myApp = angular.module('myApp', [
     "Layout",   
     "ngTagsInput",  
     "List",
-	"Imagemap"]);
+	"Imagemap",
+    "Grideye"]);
 myApp
     .constant("menuItemsJson",  menuItems)
     .constant("headerItemsJson", headerItems)

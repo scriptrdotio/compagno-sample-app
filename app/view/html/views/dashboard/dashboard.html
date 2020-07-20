@@ -922,10 +922,9 @@
                                 <scriptr-grideye 
                                                  transport='wss' 
                                                  msg-tag="{{vm.tag}}" 
-                                                 boxLabel='Temperature Grid'
-
+                                                 data="vm.selectedDevice.temperature_list.value"
                                                  api='app/api/getDevicesSensorsHistory'
-                                                 api-params="vm.params"
+                                                 api-params="vm.grideyeParams"
 
                                                  on-format-data="vm.grideyeFormatData">
                                 </scriptr-grideye>
