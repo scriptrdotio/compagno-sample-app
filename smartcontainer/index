@@ -1,5 +1,0 @@
-var themeloader = require("app/entities/themeloader");
-return themeloader.serveTheme("app/view/html/index.unpackaged.html", {
-    "theme": "smartcontainer", 
-    "mapKey": "AIzaSyBcPYghFh_BXz4dDz-TXTHbU2iV3Wbf57I"
-})
