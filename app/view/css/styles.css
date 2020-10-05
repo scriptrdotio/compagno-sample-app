@@ -1,3 +1,4 @@
+html, body {min-height:100%; height:auto;}
 /** tabs ***/
 .nav-styled {}
 .nav-styled>li a {background: #d8d8d8; color: #222; border-radius: 0; margin: 0 1px;}
@@ -12,7 +13,9 @@
 .pdb2 {padding-bottom: 2px;}
 .mrgr15 {margin-right: 15px;}
 .mrgb10 {margin-bottom: 10px;}
-
+.p15 {
+    padding: 15px;
+}
 .clear {clear: both;}
 
 .summary .fnt16 {line-height: 1.4em;}
@@ -98,7 +101,7 @@ tags-input .tags.focused {box-shadow: none;}
     background-position: center;}
 
 /*** index summary ***/
-.index-summary {color:#3e434a; font-weight: bold;}
+.index-summary {color:#3e434a; font-weight: bold; height: 400px!important; width:830px!important;  }
 .index-summary h5 {
     margin: 0 0 10px 0;
     padding: 10px;
@@ -133,21 +136,118 @@ header, .logo, .side-bar {
   }
 }
 
+/** overriding google maps css **/
 .ng-map-info-window > :first-child{
-    width:calc(100vw - 210px);
-    max-width:100vw !important;  /*overriding google maps css */
-    height:85vh;
+    width: 870px;
+    max-width:100vw !important;
+    height: 500px;
     max-height:85vh !important;
-	z-index:1;
+    z-index:1;
 }
 
+/*overriding google maps css */
 @media (max-width:767px) {
     .ng-map-info-window > :first-child{
-        width:calc(100vw - 10px);
-        max-width:100vw !important;  /*overriding google maps css */
+        width:870px;
+        max-width:870px!important; 
+        height: 500px;
     }
 }
 
 .gm-style-iw-d{
     max-height:100% !important;
+}
+
+.gm-style .gm-style-iw-a {
+    top: 268px!important;
+}
+
+.large.marker-pin {
+  width: 110px;
+  height: 110px;
+  margin: -130px 0px 0px -67px; 
+}
+
+.large.marker-pin::after {
+    width: 104px;
+    height: 104px;
+}
+
+.marker-pin {
+  width: 80px;
+  height: 80px;
+  margin: -100px 0px 0px -37px; 
+}
+
+.marker-pin::after {
+    width: 74px;
+    height: 74px;
+}
+
+.custom-div-icon .markerImg {
+    width: 24px;
+    height: 24px;
+}
+.indicator-value {
+    color: #fff;
+    font-weight: 800;
+}
+
+.dashboardTheme .box-filter {
+    word-break: break-word;
+    width: calc(100% - 65px);
+    font-weight: 700;
+    color: #000;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: default;
+    font-size: 1.2em;
+}
+
+
+input.tgl-radio-tab-child {
+    position: absolute;
+    left: -99999em;
+    top: -99999em;
+    opacity: 1;
+    z-index: 1
+}
+
+input.tgl-radio-tab-child+label {
+    cursor: pointer;
+    margin-right: -1px;
+    padding: .5em 1em;
+    position: relative;
+    color: #72abb7
+}
+
+input.tgl-radio-tab-child+label:hover {
+    color: #FFF;
+    background-color: #72abb7;
+    border-radius: 10px
+}
+
+[type=radio]:checked+label {
+    z-index: 1;
+    color: #FFF;
+    background-color: #72abb7;
+    border-radius: 10px
+}
+
+
+.username {
+    background: #75adba;
+}
+
+header, .logo, .side-bar {
+    background: #75adba;
+}
+
+.menu-wrap .level-bg-0 {
+    background: #92bbc4;
+}
+
+header {
+    background: #92bbc4;
 }

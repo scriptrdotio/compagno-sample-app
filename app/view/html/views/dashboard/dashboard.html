@@ -14,45 +14,42 @@
                 <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> 
             </div>
         </div>
-        
-      
-        <div gridster="vm.gridsterOptions" ng-if="vm.deviceKey != null">
+        <div class="box-filter tgl-radio-tabs">
+            <input id="live" type="radio" class="form-check-input tgl-radio-tab-child" ng-model="vm.view" value="live" ng-change="vm.changeView(vm.view)">
+            <label for="live">Live</label>
+            <input  id="historical" type="radio" class="form-check-input tgl-radio-tab-child" ng-model="vm.view" value="historical" ng-change="vm.changeView(vm.view)">
+            <label for="historical">Historical</label>
+        </div>
+       <div  ng-switch="vm.view">
+        <div gridster="vm.gridsterOptions" ng-show="vm.view == 'live'">
             <ul>
-                <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col: 0, row: 0 }' ng-if="vm.latest.temperature">
+                <li class="myItem" gridster-item='item.size' ng-repeat="item in vm.liveItems">
                     <div class="box">
                         <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Temperature">Temperature</span></div>
+						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="{{item.label}}">{{item.label}}</span></div>
 						  </div>
                           <div class="clearfix"></div>
 						  <div class="box-content">                              
-                              <!--<scriptr-thermometer
-                                                   boxLabel='Temperature'
-                                                   step='20'
-                                                   unit='°C'
-                                                   custom-sectors='[{"color":"#005588","lo":-30,"hi":40},{"color":"#00953c","lo":40,"hi":80},{"color":"#ce2029","lo":80,"hi":120}]'
-                                                   transport='wss'
-                                                   msg-tag='{{vm.tag}}'
-                                                   value='{{vm.selectedDevice.temperature.value}}'
-                                                   on-format-data='vm.temperatureFormatData'>
-                                </scriptr-thermometer>-->
-                              
-						  <scriptr-gauge
+						  		<scriptr-gauge ng-if="item.type=='gauge'"
                                          transport='wss'
-                                         boxLabel='Temperature'
+                                         boxLabel='{{item.label}}'
+                                         symbol='{{item.symbol}}'
+                                         gauge-value='item.gaugeValue'
+                                         on-format-data='item.formatFunction'
+                                         level-colors='{{item.levelColors}}'
+                                         min='{{item.min}}'
+                                         max='{{item.max}}'
                                          msg-tag='{{vm.tag}}'
-                                         gauge-value='vm.selectedDevice.temperature.value'
                                          api-params='vm.params'                      
                                          value-font-color='#999'
-                                         min='-40'
-                                         max='120'
                                          hide-min-max='false'
                                          hide-value='false'
                                          show-inner-shadow='false'
                                          custom-sectors='{"percents":"false","ranges":[{}]}'
                                          shadow-size='5'
                                          shadow-opacity='0.8'
-                                         start-animation-type='linear'
-                                         refresh-animation-type='linear'
+                                         start-animation-type='>'
+                                         refresh-animation-type='>'
                                          value-font-family='Source Sans Pro'
                                          value-min-font-size='12'
                                          label-min-font-size='12'
@@ -60,7 +57,6 @@
                                          max-label-min-font-size='12'
                                          gauge-width-scale='1'
                                          shadow-vertical-offset='3'
-                                         level-colors='["#1e79da","#fce94f","#fcaf3e","#d93b3b"]'
                                          relative-gauge-size='true'
                                          no-gradient='false'
                                          start-animation-time='700'
@@ -71,869 +67,120 @@
                                          decimals='2'
                                          format-number='true'
                                          human-friendly='false'
-                                         human-friendly-decimal='2'
                                          pointer='false'
                                          counter='false'
                                          http-method='GET'
-                                         symbol='{{vm.selectedDevice.temperature_unit.value || "°"}}'
-                                         on-format-data='vm.temperatureFormatData'
                                          >
                               </scriptr-gauge>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col: 0, row: 1 }' ng-if="vm.latest.humidity">
-                    <div class="box">
-						  <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Humidity Level">Humidity Level</span></div>
-						  </div>
-                          <div class="clearfix"></div>
-                         <div class="box-content">
-                            <scriptr-gauge
-                                           transport='wss'
-                                           boxLabel='Humidity Level'
-                                           msg-tag='{{vm.tag}}'
-                                           gauge-value='vm.selectedDevice.humidity.value'
-                                           value-font-color='#999'
-                                           min='0'
-                                           max='100'
-                                           hide-min-max='false'
-                                           hide-value='false'
-                                           show-inner-shadow='false'
-                                           custom-sectors='{"percents":"false","ranges":[{}]}'
-                                           shadow-size='5'
-                                           shadow-opacity='0.2'vm.deviceKey
-                                           start-animation-type='linear'
-                                           refresh-animation-type='linear'
-                                           value-font-family='Source Sans Pro'
-                                           value-min-font-size='12'
-                                           label-min-font-size='12'
-                                           min-label-min-font-size='12'
-                                           max-label-min-font-size='12'
-                                           gauge-width-scale='1'
-                                           shadow-vertical-offset='3'
-                                           level-colors='["#a9d70b","#f9c802","#ff0000"]'
-                                           relative-gauge-size='true'
-                                           no-gradient='false'
-                                           start-animation-time='700'
-                                           refresh-animation-time='700'
-                                           donut='false'
-                                           donut-start-angle='90'
-                                           reverse='false'
-                                           decimals='2'
-                                           format-number='false'
-                                           human-friendly='false'
-                                           human-friendly-decimal='2'
-                                           pointer='false'
-                                           counter='false'
-                                           http-method='GET'
-                                           symbol='{{vm.selectedDevice.humidity_unit.value || "%"}}'
-                                           on-format-data='vm.humidityFormatData'
-                                           >
-                             </scriptr-gauge>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 3, sizeY: 2, col: 1, row: 0}' ng-if="vm.selectedDevice.temperature">
-                    <div class="box">
-						  <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Humidity / Temperature">Humidity / Temperature</span></div>
-						  </div>
-                         <div class="clearfix"></div>
-                        <div class="box-content">
-                            <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='Humidity / Temperature'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsTempHumiParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsTempHumData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y2-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y2-axis-label-font-size='12'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Temperature","colors":"#ad7fa8","axisSelection":"y","unit":"°"},{"labels":"Humidity","colors":"#FCC717","axisSelection":"y","unit":"%"}]'
-
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              draw-y2-axis='false'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              y2-axis-line-color='#000000'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y2-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y2-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              y2-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              y2-draw-grid='false'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              y2-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              y2-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-                                              y2-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                            <!--
-                           <scriptr-chart
-                                          type='line'
-                                          boxLabel='Humidity / Temperature'
-                                          xkey='creationDate'
-                                          ykeys='["humidity", "temperature"]'
-                                          labels='["Humidity", "Temperature"]'
-                                          colors='["#FCC717","#38B9D6", "#1DBC68"]'
-                                          transport='wss'
-                                          api="app/api/getDeviceHistory"
-                                          api-params="vm.params"
-                                          msg-tag='{{vm.tag}}'
-                                          data="vm.historicalData"
-                                          grid-text-family='Source Sans Pro'
-                                          line-width='3'
-                                          point-size='4'
-                                          point-stroke-colors='["#fff"]'
-                                          ymax='auto'
-                                          ymin='auto 0'
-                                          smooth='true'
-                                          hide-hover='auto'
-                                          parse-time='true'
-                                          xlabels='auto'
-                                          xlabel-angle='0'
-                                          goal-stroke-width='1'
-                                          goal-line-colors='["#666633","#999966","#cc6666","#663333"]'
-                                          event-stroke-width='1'
-                                          event-line-colors='["#005a04","#ccffbb","#3a5f0b","#005502"]'
-                                          axes='true'
-                                          grid='true'
-                                          grid-text-color='#888'
-                                          grid-text-size='12'
-                                          grid-text-weight='normal'
-                                          http-method='GET'
-                                          point-fill-colors='[null]'
-                                          goals='[null]'
-                                          events='[null]'
-                                          on-format-data='vm.historicalFormatData'
-                                          ></scriptr-chart> -->
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col:0, row:2 }' ng-if="vm.latest.co2">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="CO2 Level">CO2 Level</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" >
-                                <scriptr-gauge
-                                               transport='wss'
-                                               boxLabel='CO2 Level'
-                                               msg-tag='{{vm.tag}}'
-                                               gauge-value='vm.selectedDevice.co2.value'
-                                               value-font-color='rgb(153, 153, 153)'
-                                               min='400'
-                                               max='1500'
-                                               hide-min-max='false'
-                                               hide-value='false'
-                                               show-inner-shadow='false'
-                                               custom-sectors='{"percents":"false","ranges":[{}]}'
-                                               shadow-size='5'
-                                               shadow-opacity='0.2'
-                                               start-animation-type='linear'
-                                               refresh-animation-type='linear'
-                                               value-font-family='Source Sans Pro'
-                                               value-min-font-size='12'
-                                               label-min-font-size='12'
-                                               min-label-min-font-size='12'
-                                               max-label-min-font-size='12'
-                                               gauge-width-scale='1'
-                                               shadow-vertical-offset='3'
-                                               level-colors='["#a9d70b","#f9c802","#ff0000"]'
-                                               relative-gauge-size='true'
-                                               no-gradient='false'
-                                               start-animation-time='700'
-                                               refresh-animation-time='700'
-                                               donut='false'
-                                               donut-start-angle='90'
-                                               reverse='false'
-                                               decimals='2'
-                                               format-number='false'
-                                               human-friendly='false'
-                                               human-friendly-decimal='2'
-                                               pointer='false'
-                                               counter='false'
-                                               http-method='GET'
-                                               symbol='{{vm.selectedDevice.co2_unit.value || "ppm"}}'
-                                               label-font-color='rgb(153, 153, 153)'
-                                               on-format-data='vm.co2FormatData'>
-                                </scriptr-gauge> 
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 3, sizeY: 1, col:1, row: 2}' ng-if="vm.selectedDevice.co2">
-                    <div class="box">
-						  <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="CO2 Level">CO2 Level</span></div>
-						  </div>
-                         <div class="clearfix"></div>
-                        <div class="box-content">
-                            <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='CO2 Level'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsCo2Params'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsCo2Data'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y2-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y2-axis-label-font-size='12'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"CO2","colors":"#ad7fa8","axisSelection":"y","unit":"ppm"}]'
-
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              draw-y2-axis='false'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              y2-axis-line-color='#000000'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y2-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y2-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              y2-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              y2-draw-grid='false'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              y2-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              y2-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-                                              y2-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col:0, row:3 }' ng-if="vm.latest.pressure">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Atmospheric Pressure">Atmospheric Pressure</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" >
-                                <scriptr-gauge
-                                               transport='wss'
-                                               boxLabel='Atmospheric Pressure'
-                                               msg-tag='{{vm.tag}}'
-                                               gauge-value='vm.selectedDevice.pressure.value'
-                                               value-font-color='rgb(153, 153, 153)'
-                                               min='800'
-                                               max='1260'
-                                               hide-min-max='false'
-                                               hide-value='false'
-                                               show-inner-shadow='false'
-                                               custom-sectors='{"percents":"false","ranges":[{}]}'
-                                               shadow-size='5'
-                                               shadow-opacity='0.2'
-                                               start-animation-type='linear'
-                                               refresh-animation-type='linear'
-                                               value-font-family='Source Sans Pro'
-                                               value-min-font-size='12'
-                                               label-min-font-size='12'
-                                               min-label-min-font-size='12'
-                                               max-label-min-font-size='12'
-                                               gauge-width-scale='1'
-                                               shadow-vertical-offset='3'
-                                               level-colors='["#a9d70b","#f9c802","#ff0000"]'
-                                               relative-gauge-size='true'
-                                               no-gradient='false'
-                                               start-animation-time='700'
-                                               refresh-animation-time='700'
-                                               donut='false'
-                                               donut-start-angle='90'
-                                               reverse='false'
-                                               decimals='2'
-                                               format-number='false'
-                                               human-friendly='false'
-                                               human-friendly-decimal='2'
-                                               pointer='false'
-                                               counter='false'
-                                               http-method='GET'
-                                               symbol='{{vm.selectedDevice.pressure_unit.value || "Pa"}}'
-                                               label-font-color='rgb(153, 153, 153)'
-                                               on-format-data='vm.pressureFormatData'>
-                                </scriptr-gauge> 
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 3, sizeY: 1, col:1, row: 3}' ng-if="vm.selectedDevice.pressure">
-                    <div class="box">
-						  <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Pressure">Pressure</span></div>
-						  </div>
-                         <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" >
-                                <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='Pressure'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsPresParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsPressData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Pressure","colors":"#ad7fa8","axisSelection":"y","unit":"Pa"}]'
-
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                                <!--
-                                <scriptr-chart
-                                                                                     type='line'
-                                                                                     boxLabel='Pressure'
-                                                                                     xkey='creationDate'
-                                                                                     ykeys='["pressure"]'
-                                                                                     labels='["Pressure"]'
-                                                                                     colors='["#FCC717","#38B9D6", "#1DBC68"]'
-                                                                                     transport='wss'
-                                                                                     msg-tag='{{vm.tag}}'
-                                                                                     api="app/api/getDeviceHistory"
-                                                                                     api-params='vm.params'
-                                                                                     data='vm.historicalData'
-                                                                                     grid-text-family='Source Sans Pro'
-                                                                                     line-width='3'
-                                                                                     point-size='4'
-                                                                                     point-stroke-colors='["#fff"]'
-                                                                                     ymax='auto'
-                                                                                     ymin='auto 0'
-                                                                                     smooth='true'
-                                                                                     hide-hover='auto'
-                                                                                     parse-time='true'
-                                                                                     xlabels='auto'
-                                                                                     xlabel-angle='0'
-                                                                                     goal-stroke-width='1'
-                                                                                     goal-line-colors='["#666633","#999966","#cc6666","#663333"]'
-                                                                                     event-stroke-width='1'
-                                                                                     event-line-colors='["#005a04","#ccffbb","#3a5f0b","#005502"]'
-                                                                                     axes='true'
-                                                                                     grid='true'
-                                                                                     grid-text-color='#888'
-                                                                                     grid-text-size='12'
-                                                                                     grid-text-weight='normal'
-                                                                                     http-method='GET'
-                                                                                     point-fill-colors='[null]'
-                                                                                     goals='[null]'
-                                                                                     events='[null]'
-                                                                                     on-format-data='vm.historicalFormatData'
-                                                                                     ></scriptr-chart>-->
-                                
-                            </div>
-                        </div>
-                    </div>
-                </li>
-               <li class="myItem" gridster-item='{sizeX: 1, sizeY: 1, col: 0, row: 4 }' ng-if="vm.latest.tvoc">
-                    <div class="box">
-						  <div class="box-header">
-						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="TVOC">TVOC</span></div>
-						  </div>
-                         <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-gauge
-                                               transport='wss'
-                                               boxLabel='TVOC'
-                                               msg-tag='{{vm.tag}}'
-                                               gauge-value='vm.selectedDevice.tvoc.value'
-                                               api-params='vm.params'                      
-                                               value-font-color='#999'
-                                               min='0'
-                                               max='10000'
-                                               hide-min-max='false'
-                                               hide-value='false'
-                                               show-inner-shadow='false'
-                                               custom-sectors='{"percents":"false","ranges":[{}]}'
-                                               shadow-size='5'
-                                               shadow-opacity='0.8'
-                                               start-animation-type='linear'
-                                               refresh-animation-type='linear'
-                                               value-font-family='Source Sans Pro'
-                                               value-min-font-size='12'
-                                               label-min-font-size='12'
-                                               min-label-min-font-size='12'
-                                               max-label-min-font-size='12'
-                                               gauge-width-scale='1'
-                                               shadow-vertical-offset='3'
-                                               level-colors='["#1e79da","#fce94f","#fcaf3e","#d93b3b"]'
-                                               relative-gauge-size='true'
-                                               no-gradient='false'
-                                               start-animation-time='700'
-                                               refresh-animation-time='700'
-                                               donut='false'
-                                               donut-start-angle='90'
-                                               reverse='false'
-                                               decimals='2'
-                                               format-number='true'
-                                               human-friendly='false'
-                                               human-friendly-decimal='2'
-                                               pointer='false'
-                                               counter='false'
-                                               http-method='GET'
-                                               symbol='mm'
-                                               on-format-data='vm.tvocFormatData'>
-                                </scriptr-gauge> 
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="myItem" gridster-item='{sizeX: 3, sizeY: 1, col: 1, row: 4}' ng-if="vm.selectedDevice.tvoc">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="TVOC Data">TVOC Data</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='TVOC Data'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsTvocParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsTvocData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Tvoc","colors":"#ad7fa8","axisSelection":"y","unit":""}]'
-
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <!--
-                <li class="myItem" gridster-item='{sizeX: 2, sizeY: 2, col: 0 , row: 5 }' ng-if="vm.latest.acc_x">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Acceleration">Acceleration</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                          <div  style="height: calc(100% - 30px)" >  
+                              
+                              <scriptr-heatmap ng-if="item.type=='grideye'"
+                                             msg-tag='{{vm.tag}}'
+                                             transport='wss'
+                                             on-format-data="item.formatFunction"
+                                             layout-config = "item.layout"
+                                             options="item.options"
+                                             hoverinfo="z"
+                                             color-scale="item.colorScale"
+                                             >
+                             </scriptr-heatmap>
+                              
                               <scriptr-accelerometer
-                                                     transport='wss'
-                                                     msg-tag='{{vm.tag}}'
-                                                     http-method='GET'
-                                                     data='{x:20, y:1000,z:30}'
-                                                     api="app/api/getDevicesSensorsHistory"
-                                                     api-params='vm.accelerometerParams'             		
-                                                     on-format-data='vm.accelerometerFormatData'>
-                              </scriptr-accelerometer> 
-                            </div>
+                                        ng-if="item.type=='accelerometer'"
+										transport='wss'
+										msg-tag='{{vm.tag}}'
+										boxBorder='true'
+                                  		on-format-data='item.formatFunction'
+                           		></scriptr-accelerometer>
                         </div>
                     </div>
                 </li>
-                <li class="myItem" gridster-item='{sizeX: 2, sizeY: 2, col: 2, row: 5}' ng-if="vm.selectedDevice.acc_x">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Acceleration Data">Acceleration Data</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='Accelerometer Data'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsAccParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsAccData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Acc_x","colors":"#ad7fa8","axisSelection":"y","unit":""},{"labels":"Acc_y","colors":"#FCC717","axisSelection":"y","unit":""},{"labels":"Acc_z","colors":"#00FF17","axisSelection":"y","unit":""}]'
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                            </div>
-                        </div>
-                    </div>
-                </li>-->
-                
-                <li class="myItem" gridster-item='{sizeX: 4, sizeY: 1, col: 0, row: 5}' ng-if="vm.latest.particle">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Particle Data">Particle Data</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='Particle Data'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsParticleParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsParticleData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Particle","colors":"#ad7fa8","axisSelection":"y","unit":""}]'
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <!--
-                <li class="myItem" gridster-item='{sizeX: 4, sizeY: 2, col: 0, row: 7}' ng-if="vm.selectedDevice.gyr_x">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Gyroscope Data">Gyroscope Data</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-dygraphs
-                                              type='line'
-                                              boxLabel='Gyroscope Charting'
-                                              api="app/api/getDevicesSensorsHistory"
-                                              api-params='vm.dygraphsGyrParams'
-                                              transport='wss'
-                                              msg-tag='{{vm.tag}}'
-                                              on-format-data='vm.checkDygraphsGyrData'
-                                              events='[null]'
-                                              goals='[null]'
-
-                                              data-type='raw'
-                                              data-format='dygraphs'
-                                              schema-for='line'
-                                              display-metric-param='display_metric'
-                                              boxBorder='true'
-                                              grid-text-family='Source Sans Pro'
-                                              x1-axis-label-font-size='12'
-                                              x1-axis-label-width='40'
-                                              y-axis-label-width='40'
-                                              y-axis-label-font-size='12'
-                                              independent-ticks='independent'
-
-                                              colors-mapping='[{"labels":"Gyr_x","colors":"#ad7fa8","axisSelection":"y","unit":""},{"labels":"Gyr_y","colors":"#FCC717","axisSelection":"y","unit":""},{"labels":"Gyr_z","colors":"#00FF17","axisSelection":"y","unit":""}]'
-                                              show-legend='true'
-                                              legend-position='bottom'
-                                              draw-x1-axis='true'
-                                              draw-y-axis='true'
-                                              event-line-colors='["#ffffff"]'
-                                              x1-axis-line-color='#e9b96e'
-                                              y-axis-line-color='#ef2929'
-                                              x1-axis-line-width='1'
-                                              y-axis-line-width='1'
-                                              y-axis-include-zero='false'
-                                              y-axis-labels-kmb='false'
-                                              show-range-selector='true'
-                                              range-selector-alpha='0.6'
-                                              range-selector-background-line-width='1'
-                                              range-selector-background-stroke-color='#808080'
-                                              range-selector-foreground-line-width='1'
-                                              range-selector-foreground-stroke-color='#000000'
-                                              range-selector-height='40'
-                                              range-selector-plot-fill-color='#A7B1C4'
-                                              range-selector-plot-fill-gradient-color='#FFFFFF'
-                                              range-selector-plot-line-width='1.5'
-                                              range-selector-plot-stroke-color='#808FAB'
-                                              x1-draw-grid='true'
-                                              y-draw-grid='true'
-                                              x1-grid-line-color='#000000'
-                                              y-grid-line-color='#000000'
-                                              x1-grid-line-width='1'
-                                              y-grid-line-width='1'
-                                              x1-axis-label=''
-                                              y-axis-label=''
-
-                                              delta="true"
-                                              >
-                            </scriptr-dygraphs>
-                            </div>
-                        </div>
-                    </div>
-                </li>-->
-                <li class="myItem" gridster-item='{sizeX: 4, sizeY: 2, col: 0, row: 6}' ng-if="vm.selectedDevice.temperature_list">
-                    <div class="box">
-                        <div class="box-header">
-                            <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="Temperature Grid">Temperature Grid</span></div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="box-content">
-                            <div  style="height: calc(100% - 30px)" > 
-                                <scriptr-grideye 
-                                                 transport='wss' 
-                                                 msg-tag="{{vm.tag}}" 
-                                                 data="vm.selectedDevice.temperature_list.value"
-                                                 api='app/api/getDevicesSensorsHistory'
-                                                 api-params="vm.grideyeParams"
-
-                                                 on-format-data="vm.grideyeFormatData">
-                                </scriptr-grideye>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                
             </ul>
+        </div>
+        <div gridster="vm.gridsterOptions" ng-if="vm.view == 'historical'">
+            <ul>
+                <li class="myItem" gridster-item='{sizeX: 5, sizeY: 6}' ng-repeat="item in vm.historicalItems">
+                    <div class="box">
+						  <div class="box-header">
+						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="{{item.label}}">{{item.label}}</span></div>
+						  </div>
+                         <div class="clearfix"></div>
+                        <div class="box-content">
+                            <scriptr-dygraphs
+                                              type='line'
+                                              boxLabel='{{item.label}}'
+                                              api="app/api/getDevicesSensorsHistory"
+                                              api-params='item.apiParams'
+                                              transport='wss'
+                                              msg-tag='{{vm.tag}}'
+                                              on-format-data='item.formatFunction'
+                                              colors-mapping='item.colorsMapping'
+                                              delta="true"
+                                              events='[null]'
+                                              goals='[null]'
+                                              data-type='raw'
+                                              data-format='dygraphs'
+                                              schema-for='line'
+                                              display-metric-param='display_metric'
+                                              boxBorder='true'
+                                              grid-text-family="Source Sans Pro" 
+                                                  x1-axis-label-font-size="12" 
+                                                  x1-axis-label-width="40" 
+                                                  y2-axis-label-width="40" 
+                                                  y-axis-label-width="40" 
+                                                  y2-axis-label-font-size="10" 
+                                                  y-axis-label-font-size="10" 
+                                                  independent-ticks="independent" 
+                                                  show-legend="true" 
+                                                  legend-position="bottom" 
+                                                  draw-x1-axis="true" 
+                                                  draw-y-axis="true" 
+                                                  draw-y2-axis="true" 
+                                                  x1-axis-line-color="#e0e7ee" 
+                                                  y-axis-line-color="#e0e7ee" 
+                                                  y2-axis-line-color="#e0e7ee" 
+                                                  x1-axis-line-width="1" 
+                                                  y-axis-line-width="1" 
+                                                  y2-axis-line-width="1" 
+                                                  y-axis-include-zero="false" 
+                                                  y2-axis-include-zero="false" 
+                                                  y-axis-labels-kmb="false" 
+                                                  y2-axis-labels-kmb="false" 
+                                                  show-range-selector="true" 
+                                                  range-selector-alpha="0.6" 
+                                                  range-selector-background-line-width="1" 
+                                                  range-selector-background-stroke-color="#86a6c8" 
+                                                  range-selector-foreground-line-width="1" 
+                                                  range-selector-foreground-stroke-color="#dddedb" 
+                                                  range-selector-height="40" 
+                                                  range-selector-plot-fill-color="#b1c6dd" 
+                                                  range-selector-plot-fill-gradient-color="#FFFFFF" 
+                                                  range-selector-plot-line-width="1.5" 
+                                                  range-selector-plot-stroke-color="#d1d9e9" 
+                                                  x1-draw-grid="false" 
+                                                  y-draw-grid="true" 
+                                                  y2-draw-grid="true" 
+                                                  x1-grid-line-color="#f2f2f2" 
+                                                  y-grid-line-color="#f2f2f2" 
+                                                  y2-grid-line-color="#f2f2f2" 
+                                                  x1-grid-line-width="1" 
+                                                  y-grid-line-width="1" 
+                                                  y2-grid-line-width="1" 
+                                                  x1-axis-label="" 
+                                                  y-axis-label="" 
+                                                  y2-axis-label="" 
+                                                  connect-separated-points="true" 
+                                                  draw-points="true" 
+                                                  point-size="3" 
+                                                  stroke-width="1" 
+                                                  boxheader="true"
+                                              >
+                            </scriptr-dygraphs>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        </div>
         </div>
     </div>
 </section>

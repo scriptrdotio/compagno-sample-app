@@ -1,17 +1,30 @@
+
+var mapKey = "AIzaSyBkEYaOdre3EloXqR-IpZ9YDVHNM5vN-M0";
+var cdnJsPath = "//scriptr-cdn.s3.amazonaws.com/hvac-monitoring/javascript/";
+var cdnCssPath = "//scriptr-cdn.s3.amazonaws.com/hvac-monitoring/css/";
+
 var expiry = 60;
-
-
 var dmpDeviceBroker = "myDmpBroker";
 
-var defaultApp = "smartkitchen";
+var defaultApp = "compagno";
 
 var businessRuleScript = "app/entities/rules/decisionTable";
 
-var availableDeviceTypes = [
-    require("app/config/nebula-2.0/config"),
-    require("app/config/B-L475E-IOT01A/config"),
-    require("app/config/B-L072Z-LRWAN1/config")
-]
+var mapper = "app/config/dataTransformation"
+
+var deviceDataTopUp =  {
+    "lat": 45.4592031, 
+    "long": -73.8248199,
+    "address": "Worldwide Corporate Headquarters 237 Hymus Boulevard Pointe Claire",
+    "city": "Quebec",
+    "country": "Canada",
+    "locationType": "Offices",
+    "locationSection": "Reception area",
+    "physicalEnvironment": "HVAC system",
+    "sensor": "compagno board",
+    "source": "simulator"
+}
+
 
 var email = {
     "TO": "",
@@ -21,57 +34,44 @@ var email = {
 
 var templates = {
   mail: {
-      HIGH_TEMPERATURE: {
-        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Temperature!',
-        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high temperature of <%= temperature %>.'
+      FIRE_ALARM: {
+        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Fire Alarm or Smoke Detection!',
+        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> tvoc sensor has a recording of <%= tvoc %> & co2 sensor has a recording of <%= co2 %>.'
       },
-      LOW_TEMPERATURE: {
-        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Temperature!',
-        body: '<%= physicalEnvironment %> - <%= locationSection %> with <%= sensor %> sensor <%= id %> has low temperature of <%= temperature %>.'
+      
+      SYSTEM_BROKEN_ALARM: {
+        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Broken System !',
+        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> accelerometer sensor has a recording of Acceleration Z of <%= acc_z %>.'
       },
-      HIGH_HUMIDITY: {
-        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Humidity!',
-        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high humidity of <%= humidity %>.'
+
+      INTRUDER_DETECTED_ALARM: {
+        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Intruder Detected Alarm !',
+        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> grideye sensor has a recording of <%= grideye %>.'
       },
-      LOW_HUMIDITY: {
-        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Humidity!',
-        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low humidity of <%= humidity %>.'
+      
+      COIL_MAINTENANCE_ALARAM: {
+        subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Coil Maintenance Alarm !',
+        body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> temperature sensor has a recording of <%= temperature %> & humidity sensor has a recording of <%= humidity %>.'
+      }
+  },
+    
+  record: {
+      FIRE_ALARM: {
+        body: 'Fire Alarm or Smoke Detection: <%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> tvoc sensor has a recording of <%= tvoc %> & co2 sensor has a recording of <%= co2 %>.',
       },
-      PROXIMITY_ALERT: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Proximity Alert!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has flagged a proximity alert with value <%= proximity %>.'
+      
+      SYSTEM_BROKEN_ALARM: {
+        body: 'Broken System: <%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> accelerometer sensor has a recording of Acceleration Z of <%= acc_z %>.',
       },
-      HIGH_PRESSURE: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Pressure!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high pressure of <%= pressure %>.'
+
+      INTRUDER_DETECTED_ALARM: {
+        body: 'Intruder Detected Alarm: <%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> grideye sensor has a recording of <%= grideye %>.',
       },
-      LOW_PRESSURE: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Pressure!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low pressure of <%= pressure %>.'
-      },
-      HIGH_CO2: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High CO2 Level!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high co2 level of <%= co2 %>.'
-      },
-      LOW_CO2: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low CO2 Level! ',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low co2 level of <%= co2 %>.'
-      },
-      HIGH_TVOC: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High TVOC Level!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high tvoc level of <%= tvoc %>.'
-      },
-      LOW_TVOC: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low TVOC Level!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low tvoc level of <%= tvoc %>.'
-      },
-      HIGH_PARTICLE: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: High Particle Level!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has high particle level of <%= particle %>.'
-      },
-      LOW_PARTICLE: {
-          subject: '<%= physicalEnvironment %> - <%= locationSection %> @ <%= address %>: Low Particle Level!',
-          body: '<%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> sensor <%= id %> has low particle level of <%= particle %>.'
+      
+      COIL_MAINTENANCE_ALARAM: {
+        body: 'Coil Maintenance Alarm: <%= physicalEnvironment %> in <%= locationSection %> with <%= sensor %> device <%= id %> temperature sensor has a recording of <%= temperature %> & humidity sensor has a recording of <%= humidity %>',
       }
   }
+    
+ 
 }

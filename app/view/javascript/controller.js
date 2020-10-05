@@ -10,94 +10,88 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         console.log('going to ' + path);
         $location.path(path)
     }
-    
+
     vm.markersData = [
         {
             key: 'pressure',
-            lat: 800.0000001, 
-            lng: 200.0000001,
+            lat: 147, 
+            lng: 196,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
-                unit: 'Pa'
+                url: vm.icons["pressure"],
+                unit: 'hPa'
             }
         },
         {
             key: 'temperature',
-            lat: 850.0000001, 
-            lng: 250.0000001,
+            lat: 309, 
+            lng: 513,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
+                url: vm.icons["temperature"],
                 unit: '&deg;C'
             }
         },
         {
             key: 'humidity',
-            lat: 850.0000001, 
-            lng: 60.0000001,
+            lat: 309, 
+            lng: 738,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
+                url: vm.icons["humidity"],
                 unit: '%'
             }
         },
         {
-            key: 'proximity',
-            lat: 850.0000001, 
-            lng: 550.0000001,
+            key: 'co2',
+            lat: 131, 
+            lng: 581,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
-                unit: 'mm'
+                url: vm.icons["co2"],
+                unit: 'ppm'
             }
         },
         {
-            key: 'accelerometer',
-            lat: 450.0000001, 
-            lng: 50.0000001,
+            key: 'tvoc',
+            lat: 131, 
+            lng: 496,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
-                unit: ''
+                url:  vm.icons["tvoc"],
+                unit: 'ppb'
             }
         },
         {
-            key: 'magnetic',
-            lat: 450.0000001, 
-            lng: 200.0000001,
+            key: 'particulate',
+            lat: 131, 
+            lng: 409,
             draggable: true,
-            group: 'HVAC',
+            class: "large",
             icon: {
-                url: '',
-                unit: ''
+                url: vm.icons["particulate"],
+                unit: 'μg/m3'
+            }
+        }, 
+        {
+            key: 'vibration',
+            lat: 194, 
+            lng: 77,
+            draggable: true,
+            class: "large",
+            icon: {
+                url: vm.icons["accelerometer"],
+                unit: 'mg'
             }
         },
         {
-            key: 'gyroscope',
-            lat: 450.0000001, 
-            lng: 450.0000001,
+            key: 'noise',
+            lat: 320, 
+            lng: 194,
             draggable: true,
-            group: 'HVAC',
             icon: {
-                url: '',
-                unit: ''
-            }
-        },
-        {
-            key: 'luminosity',
-            lat: 150.0000001, 
-            lng: 450.0000001,
-            draggable: true,
-            group: 'HVAC',
-            icon: {
-                url: '',
-                unit: 'Lux'
+                url: vm.icons["noise"],
+                unit: 'db'
             }
         }
     ];
@@ -129,6 +123,8 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
     vm.transformData = function(data){
         
         var dataKeys = Object.keys(data);
+        
+
         for(var i = 0; i < dataKeys.length; i++){
             var val = data[dataKeys[i]].value;
             if(val){
@@ -139,6 +135,8 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
                 }
             }            
         }
+        data["particulate"] = "PM1: "+data["pm1_0"]+"<br/>"+"PM2.5: "+data["pm2_5"]+"<br/>"+"PM10: "+data["pm10_0"];
+        data["vibration"] = "Acc.X: "+data["acc_x"]+"<br/>"+"Acc.Y: "+data["acc_y"]+"<br/>"+"Acc.Z: "+data["acc_z"];
         return data;
     }
     
@@ -166,8 +164,6 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
                 vm.markersData[i].icon.url = regex.exec(icons[vm.markersData[i].key].$$unwrapTrustedValue())[1];
             }
         }
-        
-        
     }
     
     vm.callback = function(data){
@@ -231,7 +227,7 @@ myApp.controller('searchDevicesCtrl', function($location, headerItemsJson, menuI
 
 myApp.controller('notificationCtrl', function(httpClient) {
     var vm = this;
-    vm.params = {} 
+    vm.params = {"emails": []} 
     httpClient
         .get("app/api/notifications/getSettings", null)
         .then(
@@ -255,17 +251,17 @@ myApp.controller('notificationCtrl', function(httpClient) {
         });
 
     vm.buildParams = function(){
-        var emailsArray = [];
-        var mobilesArray = [];
-        for(var i = 0; i < vm.emails.length; i++){
-            emailsArray.push(vm.emails[i]["text"]);
-        }
-        for(var i = 0; i < vm.mobiles.length; i++){
-            mobilesArray.push(vm.mobiles[i]["text"]);
-        }
-        vm.params["emails"] = emailsArray;
-        vm.params["mobiles"] = mobilesArray;
-    } 
+		var emailsArray = [];
+		var mobilesArray = [];
+		for(var i = 0; i < vm.emails.length; i++){
+			emailsArray.push(vm.emails[i]["text"]);
+		}
+		for(var i = 0; i < vm.mobiles.length; i++){
+			mobilesArray.push(vm.mobiles[i]["text"]);
+		}
+		vm.params["emails"] = emailsArray;
+		vm.params["mobiles"] = mobilesArray;
+	}
 
 });
 
@@ -288,7 +284,7 @@ myApp.controller('rulesCtrl', function(httpClient, $sce, $timeout,$routeParams) 
         });
 });
 
-myApp.controller('alertsCtrl', function(httpClient, $routeParams, constants) {
+myApp.controller('alertsCtrl', function(httpClient, $routeParams, constants, $mdDialog) {
        var vm = this;
        vm.icons = constants.infoWindows.icons;
        vm.deviceKey = null;
@@ -323,179 +319,427 @@ myApp.controller('alertsCtrl', function(httpClient, $routeParams, constants) {
                 });
             
         }
+        
+        vm.onCellClicked = function(params, gridOptions) {
+    var messages = "";
+
+    try {
+
+      if(typeof params.value == "object" && Array.isArray(params.value)){
+        _.each(params.value, function(alert){
+          var json = JSON.parse(alert);
+          messages += json.message +"<br/>";
+        })
+      } else {
+        var json = JSON.parse(params.value);
+        messages += json.message +"<br/>";
+      }
+
+    } catch(error) {
+      messages +=  params.value +"<br/>";
+    }
+
+    if(params.colDef.headerName == "Alerts") {
+      var alert = $mdDialog.alert({
+        title: 'Alerts',
+        htmlContent: messages,
+        clickOutsideToClose:true,
+        escapeToClose: true,
+        ok: 'Close'
+      });
+      $mdDialog
+        .show( alert )
+        .finally(function() {
+        alert = undefined;
+      });
+
+    }
+  }
 });
         	
 
-myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $routeParams, constants) {
+myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $routeParams, constants, $timeout) {
     var vm = this;
     vm.icons = constants.infoWindows.icons;
     vm.deviceKey = null;
+    vm.view = "live";
     vm.gridsterOptions = {
-        pushing: true,
-		floating: true,
+        floating: false,
+        defaultSizeY: 50,
+        defaultSizeX:50,
         minRows: 1, // the minimum height of the grid, in rows
         maxRows: 100,
-        columns: 4, // the width of the grid, in columns
+        columns: 10, // the width of the grid, in columns
         colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-        rowHeight: 'match', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+        rowHeight: '/2', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
         margins: [10, 10], // the pixel distance between each widget
         defaultSizeX: 2, // the default width of a gridster item, if not specifed
         defaultSizeY: 1, // the default height of a gridster item, if not specified
-        mobileBreakPoint: 1024, // if the screen is not wider that this, remove the grid layout and stack the items
-        minColumns: 1,
+        mobileBreakPoint:480, // if the screen is not wider that this, remove the grid layout and stack the items
+        minColumns: 1, // the minimum columns the grid must have
         resizable: {
-            enabled: true
+            enabled: false
         },
         draggable: {
-            enabled: true
+            enabled: false
         }
+    };
+    
+    vm.liveItems = [
+            {
+               "key": "temperature",
+               "label": "Temperature",
+               "formatFunction":  function(data, self) { return vm.temperatureFormatData(data, self) } ,
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 85,
+               "symbol":"μg/m3",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "humidity",
+               "label": "Humidity",
+               "formatFunction": function(data, self) { return vm.humidityFormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 100,
+               "symbol":"%",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "pressure",
+               "label": "Pressure",
+               "formatFunction":  function(data, self) { return vm.pressureFormatData(data, self)},
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 26,
+               "max": 1260,
+               "symbol":"hPa",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "co2",
+               "label": "Co2",
+               "formatFunction":  function(data, self) { return vm.co2FormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 40000,
+               "symbol":"ppm",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "tvoc",
+               "label": "TVOC",
+               "formatFunction":  function(data, self) { return vm.tvocFormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 60000,
+               "symbol":"ppb",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "noise",
+               "label": "Noise",
+               "formatFunction": function(data, self) { return vm.noiseFormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 140,
+               "symbol":"db",
+               "size": {sizeX: 2, sizeY: 3, col: 1, row: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "pm1_0",
+               "label": "PM 1.0",
+               "formatFunction":  function(data, self) { return vm.pm1FormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 500,
+               "symbol":"μg/m3",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "pm2_5",
+               "label": "PM 2.5",
+               "formatFunction": function(data, self) { return vm.pm25FormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 500,
+               "symbol":"μg/m3",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+            {
+               "key": "pm10_0",
+               "label": "PM 10.0",
+               "formatFunction":  function(data, self) { return vm.pm10FormatData(data, self) },
+               "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
+               "min": 0,
+               "max": 500,
+               "symbol":"μg/m3",
+               "size": {sizeX: 2, sizeY: 3 },
+               "type": "gauge"
+        	},
+        	{
+               "key": "grideye",
+               "label": "Grid Eye",
+               "formatFunction":  function(data, self) { return vm.heatmapFormatData(data, self) },
+               "size": {sizeX: 6, sizeY: 6 },
+               "options": {
+                    displayModeBar: false, 
+                    displaylogo: false,
+                },
+               "layout": {
+                    showlegend: false,
+                    title: {},
+                    xaxis: {
+                        autorange: true,
+                        showgrid: false,
+                        zeroline: false,
+                        showline: false,
+                        autotick: true,
+                        ticks: '',
+                        showticklabels: false
+                      },
+                      yaxis: {
+                        autorange: true,
+                        showgrid: false,
+                        zeroline: false,
+                        showline: false,
+                        autotick: true,
+                        ticks: '',
+                        showticklabels: false
+                      },
+               		  margin: {
+                          l: "10",
+                          r: "10",
+                          t: "10",
+                          b: "10"
+                      }
+                },
+           	    "colorScale": "Portland",
+                "type": "grideye"
+        	},
+            {
+               "key": "accelerometer",
+               "label": "Accelerometer",
+               "formatFunction":  function(data, self) { return vm.accelerometerFormatData(data, self) },
+               "size": {sizeX: 4, sizeY: 6 },
+               "type": "accelerometer"
+        	},
+            
+                 
+        ];
+    
+    vm.changeView = function(value) {
+        vm.view = value;
     };
     
     vm.init = function(){
         if($routeParams && $routeParams.deviceId) {
             vm.deviceKey = $routeParams.deviceId;
             vm.params = {"id":  vm.deviceKey }
-            vm.tag = "dashboard_" +  vm.deviceKey;
-            wsClient.subscribe(vm.tag, vm.consumeData.bind(vm), $scope.$id);  
-            httpClient.get("app/api/getLatestDevice", vm.params).then(
-                function(data, response) {
-                    vm.consumeData(data)
-                },
-                function(err) {
-                    console.log('ERROR', error);
-                });
             
-            httpClient.get("app/api/getDeviceHistory", vm.params).then(
-                function(data, response) {
-                    vm.consumeHistoricalData(data)
-                },
-                function(err) {
-                    console.log('ERROR', error);
+            vm.tag = "dashboard_" +  vm.deviceKey;
+            
+           $timeout(function(){
+               wsClient.subscribe(vm.tag, vm.consumeData.bind(vm), $scope.$id);  
+            
+                httpClient.get("app/api/getLatestDevice", vm.params).then(
+                    function(data, response) {
+                        vm.consumeData(data)
+                    },
+                    function(err) {
+                        console.log('ERROR', error);
+                    });
+
+                httpClient.get("app/api/getDeviceHistory", vm.params).then(
+                    function(data, response) {
+                        vm.consumeHistoricalData(data)
+                    },
+                    function(err) {
+                        console.log('ERROR', error);
                 });
+           },1000);
         }
-        vm.dygraphsTempHumiParams = {
-            "query": [
-                {
-                    "sensor": ['temperature','humidity'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsCo2Params = {
-            "query": [
-                {
-                    "sensor": ['co2'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsPresParams = {
-            "query": [
-                {
-                    "sensor": ['pressure'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsProxParams = {
-            "query": [
-                {
-                    "sensor": ['proximity'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsTvocParams = {
-            "query": [
-                {
-                    "sensor": ['tvoc'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsAccParams = {
-            "query": [
-                {
-                    "sensor": ['acc_x','acc_y','acc_z'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.accelerometerParams = {
-            "query": [
-                {
-                    "sensor": ['acc_x','acc_y','acc_z'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'accelerometer'
-        };
-        vm.dygraphsParticleParams = {
-            "query": [
-                {
-                    "sensor": ['particle'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.dygraphsGyrParams = {
-            "query": [
-                {
-                    "sensor": ['gyr_x','gyr_y','gyr_z'],
-                    "device": vm.deviceKey 
-                }
-            ],
-            "format": 'dygraphs'
-        };
-        vm.grideyeParams = {
-            "query": [
-                {
-                    "sensor": ['temperature_list'],
-                    "device": vm.deviceKey
-                }
-            ],
-            "format": "grideye"
-        };
+        
+        vm.historicalItems = [
+        {
+           "key": "temperature",
+           "label": "Temperature",
+           "colorsMapping": [{"labels":"Temperature","colors":"#ad7fa8","axisSelection":"y","unit":"°C"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['temperature'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsTemperatureData
+        },
+        {
+           "key": "humidity",
+           "label": "Humidity",
+           "colorsMapping": [{"labels":"Humidity","colors":"#ad7fa8","axisSelection":"y","unit":"%"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['humidity'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsHumidityData
+        },
+        {
+           "key": "pressure",
+           "label": "Pressure",
+           "colorsMapping": [{"labels":"Pressure","colors":"#ad7fa8","axisSelection":"y","unit":"hPa"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['pressure'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsPressureData
+        },
+        {
+           "key": "co2",
+           "label": "Co2",
+           "colorsMapping": [{"labels":"Co2","colors":"#ad7fa8","axisSelection":"y","unit":"ppm"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['co2'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsCo2Data
+        },
+        {
+           "key": "tvoc",
+           "label": "TVOC",
+           "colorsMapping": [{"labels":"TVOC","colors":"#ad7fa8","axisSelection":"y","unit":"ppb"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['tvoc'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsTvocData
+        },
+        {
+           "key": "particulate",
+           "label": "Particulate",
+           "colorsMapping": [{"labels":"PM 1.0","colors":"#ad7fa8","axisSelection":"y","unit":"μg/m3"},{"labels":"PM 2.5","colors":"#e25b3c","axisSelection":"y","unit":"μg/m3"},{"labels":"PM 10.0","colors":"#c8d106","axisSelection":"y","unit":"μg/m3"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['pm1_0','pm2_5','pm10_0'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsParticulateData
+        },
+        {
+           "key": "acceleration",
+           "label": "Acceleration",
+           "colorsMapping": [{"labels":"Acc X","colors":"#ad7fa8","axisSelection":"y","unit":"mg"},{"labels":"Acc Y","colors":"#e25b3c","axisSelection":"y","unit":"mg"},{"labels":"Acc Z","colors":"#c8d106","axisSelection":"y","unit":"mg"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['acc_x','acc_y','acc_z'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsAccelerationData
+        },
+            
+        {
+           "key": "noise",
+           "label": "Noise",
+           "colorsMapping": [{"labels":"Noise","colors":"#ad7fa8","axisSelection":"y","unit":"db"}],
+           "apiParams": {
+                "query": [
+                    {
+                        "sensor": ['noise'],
+                        "device": vm.deviceKey 
+                    }
+                ],
+                "format": 'dygraphs'
+            },
+            formatFunction:  vm.checkDygraphsNoiseData
+        }
+            
+      ]
     }
 
+    vm.heatmapFormatData = function(data) {
+      var splitArrayIntoChunksOfLen = function(arr, len) {
+          var chunks = [], i = 0, n = arr.length;
+          while (i < n) {
+            chunks.push(arr.slice(i, i += len));
+          }
+          return chunks;
+        }
+      
+        return {
+            x : [1,2,3,4,5,6,7,8],
+            y : [1,2,3,4,5,6,7,8],
+            z : splitArrayIntoChunksOfLen(JSON.parse(data.latest.grideye), 8)
+
+        };
+   }
+
+    
 
     vm.consumeHistoricalData = function(data) {
         vm.historicalData = data;
     }
     
     vm.consumeData = function(data) {
-        console.log('consuming data: ', data);
-        if(data.latest) {
-            data = data.latest
-            vm.latest =  data;
-        }
         if(data && data[vm.deviceKey] && data[vm.deviceKey][0] && data[vm.deviceKey][0][0]) {
             vm.selectedDevice = data[vm.deviceKey][0][0];
-            vm.latest = vm.selectedDevice
-            if(vm.latest.acc_x){
-                vm.latest.acceleration = {
-                    x: vm.latest.acc_x,
-                    y: vm.latest.acc_y,
-                    z: vm.latest.acc_z
-                }
-            }
 		 }
     }
     
-    vm.checkDygraphsTempHumData = function(data){
+    vm.checkDygraphsTemperatureData = function(data){
         if(data instanceof Array){
             return data;
         }else{
             return [[
                 moment().valueOf(),
-                data.latest.temperature,
+                data.latest.temperature
+            ]];
+        } 
+    }
+    
+    vm.checkDygraphsHumidityData = function(data){
+        if(data instanceof Array){
+            return data;
+        }else{
+            return [[
+                moment().valueOf(),
                 data.latest.humidity
             ]];
         } 
@@ -512,24 +756,13 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         } 
     }
     
-    vm.checkDygraphsPressData = function(data){
+    vm.checkDygraphsPressureData = function(data){
         if(data instanceof Array){
             return data;
         }else{
             return  [[
                 moment().valueOf(),
                 data.latest.pressure
-            ]];
-        }
-    }
-    
-    vm.checkDygraphsProxData = function(data){
-        if(data instanceof Array){
-            return data;
-        }else{
-            return  [[
-                moment().valueOf(),
-                data.latest.proximity
             ]];
         }
     }
@@ -545,7 +778,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         }
     }
     
-    vm.checkDygraphsAccData = function(data){
+    vm.checkDygraphsAccelerationData = function(data){
         if(data instanceof Array){
             return data;
         }else{
@@ -558,13 +791,47 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         }
     }
     
+     vm.checkDygraphsParticulateData = function(data){
+        if(data instanceof Array){
+            return data;
+        }else{
+            return  [[
+                moment().valueOf(),
+                data.latest.pm1_0,
+                data.latest.pm2_5,
+                data.latest.pm10_0
+            ]];
+        }
+    }
+    vm.checkDygraphsNoiseData = function(data){
+        if(data instanceof Array){
+            return data;
+        }else{
+            return  [[
+                moment().valueOf(),
+                data.latest.noise
+            ]];
+        }
+    }
+    
+    vm.checkDygraphsVibrationData = function(data){
+        if(data instanceof Array){
+            return data;
+        }else{
+            return  [[
+                moment().valueOf(),
+                data.latest.vibration
+            ]];
+        }
+    }
+    
     vm.checkDygraphsParticleData = function(data){
         if(data instanceof Array){
             return data;
         }else{
             return  [[
                 moment().valueOf(),
-                data.latest.particle
+                data.latest.particulate
             ]];
         }
     }
@@ -582,14 +849,6 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         }
     }
     
-    vm.grideyeFormatData = function(data){
-        if(data instanceof Array){
-            return JSON.parse(data[data.length - 1].temperature_list);;
-        }else{
-            return JSON.parse(data.latest.temperature_list);
-        }
-    }
-
     vm.historicalFormatData = function(data){
         if(data.historical) 
             return data.historical;
@@ -597,6 +856,10 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
             return data;
     }  
 
+    vm.grideyeFormatData = function(data){
+        return JSON.parse(data);
+    }
+    
     vm.temperatureFormatData = function(data) {
         return data.latest.temperature;
     }
@@ -619,6 +882,22 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
     
     vm.co2FormatData = function(data){
         return data.latest.co2;
+    }
+    
+    
+    vm.noiseFormatData =  function(data) {
+        return data.latest.noise;
+    }
+    
+    vm.pm25FormatData = function(data) {
+        return data.latest.pm2_5;
+    }
+    
+     vm.pm10FormatData = function(data) {
+        return data.latest.pm10_0;
+    }
+     vm.pm1FormatData = function(data) {
+        return data.latest.pm1_0;
     }
     
     vm.accelerometerFormatData= function(data){

@@ -61,7 +61,7 @@ myApp
                     templateUrl: routingJson.params[i].template,
                     controller: routingJson.params[i].controller,
             		reloadOnSearch: false
-            }).otherwise("/map")
+            })
     }
-   // $routeProvider.otherwise("/map")
+    $routeProvider.otherwise("/map");
 }); 

@@ -12,4 +12,5 @@ if(request.body != null){
 
 var devices = [deviceManager.getLatestDeviceEntry(query.id)];
 result =  utils.format(devices);
+publish("responseChannel", {"id": "dashboard_"+query.id, "result": {"latest": devices[0]}})
 return result;

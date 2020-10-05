@@ -92,7 +92,7 @@ if(format == "dygraphs") {
         _.each(keysOrder, function(dkoEntry){
              var deviceId = entry["id"]
              var found = _.some(entry, function(value, key){
-                 if(deviceId+"-"+key == dkoEntry) {
+                 if((deviceId+"-"+key) == dkoEntry) {
                      tmp.push(parseFloat(value));
                      return true;
                  } 

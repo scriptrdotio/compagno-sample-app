@@ -10,11 +10,12 @@
                         type="btn-warning btn btn-default btn-sm"
                         is-disabled="false"
                         on-buttonclick="vm.buildParams"    
-                        transport="https"    
+                        action-transport="https"    
                         label="Save"
-                        https-method = "post"
-                        api-params="vm.params"   
+                        action-http-method = "post"
+                        action-api-params="vm.params"   
                         api="app/api/notifications/updateSettings"
+                        type="btn-warning btn btn-default btn-sm"
                         >
         </scriptr-button>
     </div>

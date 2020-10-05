@@ -5,6 +5,7 @@ var devices = require("device");
 var utils = require("app/entities/utils");
 
 var _ = require("modules/underscore/underscore.js")._;
+var moment = require("modules/momentjs/moment.min.js").moment;
 
 var deviceManager = require("app/entities/deviceManager");
 var deviceEvaluator = require("app/entities/deviceEvaluator");
@@ -21,25 +22,29 @@ log.info("[app/api/subscription/subscriber] received the following payload \n" +
 var body = request.body ? request.body : ((request.rawBody) ? request.rawBody : request.parameters);
 var inputData = typeof(body) == "string" ? JSON.parse(body) : body;
 
-_.some(config.availableDeviceTypes, function(entry) {
-    deviceConfig = entry;
-    var deviceMapper = require(entry.mapper);
-    data = deviceMapper.mapIt(inputData); 
-    data = _.omit(data, function(value, key, object) {
-        return _.isUndefined(value);
-    });
-    return (_.isEmpty(data) == false);
+var deviceMapper = require(config.mapper);
+
+data = deviceMapper.mapIt(inputData); 
+data = _.omit(data, function(value, key, object) {
+    return _.isUndefined(value);
 });
-if(data.id) {//If it is in payload
-    deviceId = data.id; 
-} else if(request.user.id != config.dmpDeviceBroker) {//If it is NOT in payload, the device is identified by the call credentials
-    deviceId = request.user.id;
-} else {
-    log.info("[app/api/subscription/subscriber] Unable to identify device. Neither id in payload nor a valid device token.\n" + JSON.stringify(data));
-    return;
+
+log.info("Data Transformer Output: "+JSON.stringify(data))
+
+if(data.lat == "NA"  || data.long == "NA" || data.gps_accuracy == "NA" || (data.gps_accuracy && data.gps_accuracy >  1.5)) { //Do not use device sent lat/long if the gps accuracy is > 1.5
+    delete data.long;
+    delete data.lat;
 }
 
 
+
+data.timestamp = moment().valueOf();
+
+if(data.id) {//If it is in payload
+    deviceId = data.id; 
+} else { //We identify it from request
+    deviceId = request.user.id;
+} 
 
 log.info("[app/api/subscription/subscriber] transform the payload into \n" + JSON.stringify(data));
 
@@ -77,6 +82,7 @@ function processEntry(entry) {
     deviceEvaluator.evaluateDevice(entry)
     deviceManager.saveDeviceEvent(entry);
     devicePublisher.publishDevice(entry);
+    return entry;
 }
 
 

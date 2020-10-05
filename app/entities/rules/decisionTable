@@ -14,24 +14,30 @@ function execute(pl) {
 var decision = [];
 
 //PRESCRIPT START
+var _ = require("modules/underscore/underscore.js")._;
 
+function detectIntruder(grideyeSensorData, upperlimit){
+  var data = JSON.parse(grideyeSensorData);
+  
+  return _.every(data, function(num) { return num > upperlimit; });
+}
 //PRESCRIPT END
 
 //RULES EVALUATION START
 if(typeof pl != "object") {
   return[];
 } else { 
-	  if((pl != null && pl["temperature"] != undefined && pl["temperature"] >7) && isAny("humidity") && isAny("pressure")){
-       decision.push({ "sendEmail": "HIGH_TEMPERATURE","isAlert": "true" });
+	  if((pl != null && pl["co2"] != undefined && pl["co2"] >400) && (pl != null && pl["tvoc"] != undefined && pl["tvoc"] >90) && isAny("acc_z") && isAny("grideye") && isAny("humidity") && isAny("temperature")){
+       decision.push({ "email": "FIRE_ALARM","record": "FIRE_ALARM" });
 	} 
-	  if(isAny("temperature") && (pl != null && pl["humidity"] != undefined && pl["humidity"] >30) && isAny("pressure")){
-       decision.push({ "sendEmail": "HIGH_HUMIDITY","isAlert": "true" });
+	  if(isAny("co2") && isAny("tvoc") && (pl != null && pl["acc_z"] != undefined && pl["acc_z"] <200) && isAny("grideye") && isAny("humidity") && isAny("temperature")){
+       decision.push({ "email": "SYSTEM_BROKEN_ALARM","record": "SYSTEM_BROKEN_ALARM" });
 	} 
-	  if((pl != null && pl["temperature"] != undefined && pl["temperature"] <3) && isAny("humidity") && isAny("pressure")){
-       decision.push({ "sendEmail": "LOW_TEMPERATURE","isAlert": "true" });
+	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && (pl != null && pl["grideye"] != undefined && detectIntruder(pl["grideye"],110)) && isAny("humidity") && isAny("temperature")){
+       decision.push({ "email": "INTRUDER_DETECTED_ALARM","record": "INTRUDER_DETECTED_ALARM" });
 	} 
-	  if(isAny("temperature") && (pl != null && pl["humidity"] != undefined && pl["humidity"] <10) && isAny("pressure")){
-       decision.push({ "sendEmail": "LOW_HUMIDITY","isAlert": "true" });
+	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && isAny("grideye") && (pl != null && pl["humidity"] != undefined && pl["humidity"] >60) && (pl != null && pl["temperature"] != undefined && pl["temperature"] >30)){
+       decision.push({ "email": "COIL_MAINTENANCE_ALARAM","record": "COIL_MAINTENANCE_ALARAM" });
 	} 
 }
 //RULES EVALUATION END

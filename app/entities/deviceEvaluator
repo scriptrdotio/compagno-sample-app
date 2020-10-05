@@ -2,6 +2,7 @@ var _= require("modules/underscore/underscore.js")._;
 var emailAlert = require("app/entities/actions/emailOnAlert");
 var utils = require("app/entities/utils");
 var config = require("app/config/config");
+var templates = require("app/entities/actions/templates");
 
 var log = require("log");
 log.setLevel("INFO");
@@ -17,10 +18,10 @@ function evaluateDevice(entry) {
         } else {
             log.info("[app/entities/deviceevaluator] Actions processing for event "+JSON.stringify(decisions));
             for(var i = 0; decisions && i < decisions.length; i++){
-                emailAlert.execute(null, entry, decisions[i].sendEmail);
-                if(decisions[i].isAlert == "true"){
-                    recordAsAlert = true; 
-                    alertType.push(decisions[i].sendEmail);
+                emailAlert.execute(null, entry, decisions[i].email);
+                if(decisions[i].record){
+                    recordAsAlert = true;
+                    alertType.push(JSON.stringify({"key": decisions[i].record, message: _.template(templates.getTemplate("record", decisions[i].record).body)(entry)}));
                 }
             }
         }

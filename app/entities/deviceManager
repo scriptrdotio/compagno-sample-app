@@ -135,17 +135,16 @@ function getDevicesHistoricalSensorsEntries(devices, sensors) {
    var suffix = "_%\" or ";
    var lastSuffix =   "_%\"";
    var query = "";
-   log.info ("Query: "+ query);
   _.forEach(devices, function(device, index, list){
          query += prefix + device + ((index == list.length - 1) ? lastSuffix : suffix);
-  })
+  });
    var params = {
-       "query" : "key like \""+ event_prefix + devices[0]+"_%\" or key like \""+  event_prefix + devices[1]+"_%\"",
+       "query" : query,
        "fields": ((Array.isArray(sensors)) ? sensors.join(",") : sensors),
        "sort": "creationDate<date:ASC>",
        "count": "true"
    }
-   log.info("Query: "+ JSON.stringify(params));
+   log.info("Query Params: "+ JSON.stringify(params));
    var result = document.query(params);
    if(result.metadata.status == "success" && result.result.documents.length > 0) {
         return result.result;

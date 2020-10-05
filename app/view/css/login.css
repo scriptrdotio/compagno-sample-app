@@ -27,7 +27,7 @@ body {
   align-items: center;
 }
 .element {display: flex; }
-.doors-img {border-radius: 8px 0 0 8px; background: rgba(255,140,0,0.7); padding: 0;overflow: hidden}
+.doors-img {border-radius: 8px 0 0 8px; background: #99bec880; padding: 0;overflow: hidden; display: flex;}
 .doors-img img {width: 100%;height: auto;}
 
 
@@ -104,6 +104,11 @@ html, body, .wrap {
 @media only screen and (max-width: 480px) {
     html, body {height: auto;}
     .element {display: block;}
+}
+.doors-img img {
+    margin: auto;
+    height: auto;
+    width: 55%;
 }
 
 

@@ -41,28 +41,23 @@ channelsList.forEach(function(channel) {
 
 
 var defaultDevice = { //This device is used by to authenticate a single device
-    "id":"myDevice",
-    "password" : "demo",
-    "name" : "myDevice",
+    "id":"stwincompagno",
+    "password" : "stwincompagno",
+    "name" : "stwincompagno",
     "type": "hardware",
-    "lat": 45.6307159, 
-    "long": -73.9373892,
-    "address": "Little Feet Meadow",
-    "city": "Montreal",
+    "lat": 45.4592031, 
+    "long": -73.8248199,
+    "address": "Worldwide Corporate Headquarters 237 Hymus Boulevard Pointe Claire",
+    "city": "Quebec",
     "country": "Canada",
-    "locationType": "Ranch",
-    "locationSection": "Neck Collar",
-    "physicalEnvironment": "Cow",
-    "sensor": "mySensorType",
+    "locationType": "Offices",
+    "locationSection": "Reception area",
+    "physicalEnvironment": "HVAC system",
+    "sensor": "compagno board",
     "source": "simulator"
 }
 
 var devicesList = [
-    { //This device is used by to authenticate the messaging of group of devices to scriptr example, used for the authentication with the mqtt bridge, or to add the messaging queue
-        "id":"myDmpBroker",
-        "password" : "demo",
-        "name" : "myDmpBroker"
-    },
     defaultDevice
 ];
 
@@ -94,41 +89,16 @@ var usersList = [
 
 usersList.forEach(function(params) {
   var step8= users.save(params);
-  var step9=users.generateToken(params.id, {"password": params.password, "expiry": 1800, "lifeTime": 7200, "bindToReferrer": "false"});
   responseObject["userCreation_"+params.id] = JSON.stringify(step8);
-  responseObject["userTokenCreation_"+params.id] = JSON.stringify(step9);
-
 });
 
 
 //Create the channel used by the mqtt bridge between scriptr and ibm bluemix
 var channelsList =  ["deviceDigest"];
 var params = {"name" : "deviceDigest", "subscribeACL": ["authenticated"],"publishACL":  ["authenticated"]};
-var step10 = apsdb.callApi("SaveChannel", params , null )
+var step9 = apsdb.callApi("SaveChannel", params , null )
 responseObject["channelCreation_"+params.name] = JSON.stringify(step10);
 
-//Setup the mqtt connection instance (ibm free tier)
-var params = {
-    'name': 'deviceDigestEndpoint',
-    'protocol': 'mqtt',
-    'url':'quickstart.messaging.internetofthings.ibmcloud.com',
-    'topic': 'iot-2/type/sensors/id/device'+request.account.accountKey+'/evt/+/fmt/json',
-    'clientId': 'a:quickstart:scriptr-'+request.account.accountKey
-    
-}
-var response = apsdb.callApi("SaveExternalEndpointConfiguration", params, null);
-responseObject["createMqttExternalEndPoint"] = JSON.stringify(response);
-
-
-//Link the bridge to the channel for publishing messages
-//The free trial if not activated yet can be activated by going to channels and clicking on bridges under any channel and clicking on free trial button
-var params = {
-    "channel": "deviceDigest",
-    "externalEndpointConfiguration":"deviceDigestEndpoint",
-    "auth_token": devices.get("myDmpBroker").result["auth_token"]
-}
-var response = apsdb.callApi("AddBridge", params, null);
-responseObject["AddBridge"] = JSON.stringify(response);
 
 var pubsub = require("pubsub");
 var topic = pubsub.getInstance("deviceDigest");
