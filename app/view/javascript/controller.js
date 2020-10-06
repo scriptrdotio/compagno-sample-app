@@ -16,7 +16,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'pressure',
             lat: 147, 
             lng: 196,
-            draggable: true,
+            draggable: false,
             icon: {
                 url: vm.icons["pressure"],
                 unit: 'hPa'
@@ -26,7 +26,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'temperature',
             lat: 309, 
             lng: 513,
-            draggable: true,
+            draggable: false,
             icon: {
                 url: vm.icons["temperature"],
                 unit: '&deg;C'
@@ -36,7 +36,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'humidity',
             lat: 309, 
             lng: 738,
-            draggable: true,
+            draggable: false,
             icon: {
                 url: vm.icons["humidity"],
                 unit: '%'
@@ -46,7 +46,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'co2',
             lat: 131, 
             lng: 581,
-            draggable: true,
+            draggable: false,
             icon: {
                 url: vm.icons["co2"],
                 unit: 'ppm'
@@ -56,7 +56,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'tvoc',
             lat: 131, 
             lng: 496,
-            draggable: true,
+            draggable: false,
             icon: {
                 url:  vm.icons["tvoc"],
                 unit: 'ppb'
@@ -66,7 +66,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'particulate',
             lat: 131, 
             lng: 409,
-            draggable: true,
+            draggable: false,
             class: "large",
             icon: {
                 url: vm.icons["particulate"],
@@ -77,7 +77,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'vibration',
             lat: 194, 
             lng: 77,
-            draggable: true,
+            draggable: false,
             class: "large",
             icon: {
                 url: vm.icons["accelerometer"],
@@ -88,7 +88,7 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
             key: 'noise',
             lat: 320, 
             lng: 194,
-            draggable: true,
+            draggable: false,
             icon: {
                 url: vm.icons["noise"],
                 unit: 'db'
