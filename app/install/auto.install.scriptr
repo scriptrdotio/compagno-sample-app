@@ -97,7 +97,7 @@ usersList.forEach(function(params) {
 var channelsList =  ["deviceDigest"];
 var params = {"name" : "deviceDigest", "subscribeACL": ["authenticated"],"publishACL":  ["authenticated"]};
 var step9 = apsdb.callApi("SaveChannel", params , null )
-responseObject["channelCreation_"+params.name] = JSON.stringify(step10);
+responseObject["channelCreation_"+params.name] = JSON.stringify(step9);
 
 
 var pubsub = require("pubsub");
