@@ -449,7 +449,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
                "min": 0,
                "max": 140,
                "symbol":"db",
-               "size": {sizeX: 2, sizeY: 3, col: 1, row: 3 },
+               "size": {sizeX: 2, sizeY: 3 },//, col: 1, row: 3 },
                "type": "gauge"
         	},
             {
@@ -489,14 +489,14 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
                "key": "grideye",
                "label": "Grid Eye",
                "formatFunction":  function(data, self) { return vm.heatmapFormatData(data, self) },
-               "size": {sizeX: 6, sizeY: 6 },
+               "size": {sizeX: 10, sizeY: 6 },
                "options": {
                     displayModeBar: false, 
                     displaylogo: false,
                 },
                "layout": {
                     showlegend: false,
-                    title: {},
+                    title: false,
                     xaxis: {
                         autorange: true,
                         showgrid: false,
@@ -525,11 +525,36 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
            	    "colorScale": "Portland",
                 "type": "grideye"
         	},
-            {
-               "key": "accelerometer",
+            /**{
+               "key": "acc_z",
                "label": "Accelerometer",
                "formatFunction":  function(data, self) { return vm.accelerometerFormatData(data, self) },
                "size": {sizeX: 4, sizeY: 6 },
+               "type": "accelerometer"
+        	},**/
+        
+            {
+               "key": "acc_x",
+               "label": "Acceleration X",
+               "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
+               "size": {sizeX: 2, sizeY: 1 },
+               "noHeader": true,
+               "type": "accelerometer"
+        	},
+             {
+               "key": "acc_y",
+               "label": "Acceleration Y",
+               "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
+               "size": {sizeX: 2, sizeY: 1 },
+               "noHeader": true,
+               "type": "accelerometer"
+        	},
+             {
+               "key": "acc_z",
+               "label": "Acceleration Z",
+               "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
+               "size": {sizeX: 2, sizeY: 1 },
+               "noHeader": true,
                "type": "accelerometer"
         	},
             
@@ -907,6 +932,19 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         }else{
             return {"x": data.latest.acc_x, "y": data.latest.acc_y, "z": data.latest.acc_z};
         }
+    }
+    
+    
+    vm.accXFormatData= function(data){
+        return {"value" : data.latest.acc_x};
+    }
+    
+    vm.accYFormatData= function(data){
+        return {"value" : data.latest.acc_y};
+    }
+    
+    vm.accZFormatData= function(data){
+        return {"value" : data.latest.acc_z};
     }
     
     vm.callback = function(data){

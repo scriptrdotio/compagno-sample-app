@@ -23,8 +23,8 @@
        <div  ng-switch="vm.view">
         <div gridster="vm.gridsterOptions" ng-show="vm.view == 'live'">
             <ul>
-                <li class="myItem" gridster-item='item.size' ng-repeat="item in vm.liveItems">
-                    <div class="box">
+                <li class="myItem" gridster-item='item.size' ng-repeat="item in vm.liveItems" ng-class="{'fit-to-widget': item.noHeader === true}">
+                    <div class="box" ng-class="{'box-without-header': item.noHeader === true}">
                         <div class="box-header">
 						    <div class="box-label"><span tooltip-append-to-body="true" uib-tooltip="{{item.label}}">{{item.label}}</span></div>
 						  </div>
@@ -84,13 +84,36 @@
                                              >
                              </scriptr-heatmap>
                               
-                              <scriptr-accelerometer
-                                        ng-if="item.type=='accelerometer'"
-										transport='wss'
+                             <scriptr-displaycount ng-if="item.type=='accelerometer'"
+										boxHeader='false'
 										msg-tag='{{vm.tag}}'
-										boxBorder='true'
+                                        transport='wss'
+										message='{{item.label}}'
+										number-cell-size='medium'
+										number-background-colors='[{"value":10,"color":"#ef2929"},{"value":20,"color":"#729fcf"},{"value":30,"color":"#8ae234"}]'
+										dashboard-data-handler='false'
+										http-method='GET'
+										use-window-params='false'
+										isDashboard='false'
+										query='[]'
+										widget-layout='horizontal'
+										number-font-family='Arial'
+										message-font-family='Arial'
+										number-font-size='42'
+										message-font-size='18'
+										number-font-weight='600'
+										message-font-weight='600'
+										number-text-color='#ffffff'
+										message-text-color='#686868'
+										number-background-color='#ff8c00'
+										message-background-color='white'
+										message-Text-Alignment='center'
+										number-Text-Alignment='center'
+										border-size='1'
+										border-color='#d7d7d7'
                                   		on-format-data='item.formatFunction'
-                           		></scriptr-accelerometer>
+                           		>
+                                </scriptr-displaycount>
                         </div>
                     </div>
                 </li>

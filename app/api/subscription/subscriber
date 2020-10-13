@@ -13,7 +13,6 @@ var devicePublisher = require("app/entities/devicePublisher");
 
 var config = require("app/config/config");
 
-var deviceConfig = null;
 var data = {};
 var deviceId = null;
 var dataMapping = {};
@@ -31,7 +30,7 @@ data = _.omit(data, function(value, key, object) {
 
 log.info("Data Transformer Output: "+JSON.stringify(data))
 
-if(data.lat == "NA"  || data.long == "NA" || data.gps_accuracy == "NA" || (data.gps_accuracy && data.gps_accuracy >  1.5)) { //Do not use device sent lat/long if the gps accuracy is > 1.5
+if( (data.lat && isNaN(parseFloat(data.lat)))  || (data.long && isNaN(parseFloat(data.long)))  || (data.gps_accuracy && isNaN(parseFloat(data.gps_accuracy))) || (data.gps_accuracy && !isNaN(parseFloat(data.gps_accuracy)) && parseFloat(data.gps_accuracy) >  1.5)) { //Do not use device sent lat/long if the gps accuracy is > 1.5
     delete data.long;
     delete data.lat;
 }
@@ -52,18 +51,18 @@ if(!_.isEmpty(data)) {
     try {
         var deviceDefinition = deviceManager.getDeviceDefinition(deviceId);
         log.info("Existing Device Definition: "+JSON.stringify(deviceDefinition))
-        if(deviceDefinition == null) {
+        if(deviceDefinition == null || (data.lat && !isNaN(parseFloat(data.lat))  && data.long && !isNaN(parseFloat(data.long))  && data.gps_accuracy && !isNaN(parseFloat(data.gps_accuracy)) &&  parseFloat(data.gps_accuracy) <=  1.5)) {
             var deviceDefinition = {};
             
-            _.extend(deviceConfig.deviceDataTopUp, utils.randomGeo({"lat": deviceConfig.deviceDataTopUp.lat, "lng": deviceConfig.deviceDataTopUp.long}, 2000));
+            _.extend(config.deviceDataTopUp, utils.randomGeo({"lat": config.deviceDataTopUp.lat, "lng": config.deviceDataTopUp.long}, 2000));
             
-            deviceDefinition = _.extend(deviceConfig.deviceDataTopUp, data);
+            deviceDefinition = _.extend(config.deviceDataTopUp, data);
             deviceDefinition.id = deviceDefinition.name = deviceId;
             deviceDefinition = deviceManager.buildDeviceDefinitionDocument(deviceDefinition);
             //Save device definition
             log.info("[app/api/subscription/subscriber] Creating Device Definition: "+JSON.stringify(deviceDefinition))
             var result = deviceManager.saveDeviceDefinition(deviceDefinition);
-        }
+        } 
         var entry = {};
         entry = deviceManager.buildDeviceEventDocument(deviceDefinition, data);
         log.info("[app/api/subscription/subscriber] Processing Event Entry: " + JSON.stringify(entry))	
