@@ -27,17 +27,20 @@ function detectIntruder(grideyeSensorData, upperlimit){
 if(typeof pl != "object") {
   return[];
 } else { 
-	  if((pl != null && pl["co2"] != undefined && pl["co2"] >400) && (pl != null && pl["tvoc"] != undefined && pl["tvoc"] >90) && isAny("acc_z") && isAny("grideye") && isAny("humidity") && isAny("temperature")){
+	  if((pl != null && pl["co2"] != undefined && pl["co2"] >400) && (pl != null && pl["tvoc"] != undefined && pl["tvoc"] >190) && isAny("acc_z") && isAny("grideye") && isAny("humidity") && isAny("temperature") && isAny("noise")){
        decision.push({ "email": "FIRE_ALARM","record": "FIRE_ALARM" });
 	} 
-	  if(isAny("co2") && isAny("tvoc") && (pl != null && pl["acc_z"] != undefined && pl["acc_z"] <200) && isAny("grideye") && isAny("humidity") && isAny("temperature")){
+	  if(isAny("co2") && isAny("tvoc") && (pl != null && pl["acc_z"] != undefined && pl["acc_z"] <0.2) && isAny("grideye") && isAny("humidity") && isAny("temperature") && isAny("noise")){
        decision.push({ "email": "SYSTEM_BROKEN_ALARM","record": "SYSTEM_BROKEN_ALARM" });
 	} 
-	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && (pl != null && pl["grideye"] != undefined && detectIntruder(pl["grideye"],110)) && isAny("humidity") && isAny("temperature")){
+	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && (pl != null && pl["grideye"] != undefined && detectIntruder(pl["grideye"],110)) && isAny("humidity") && isAny("temperature") && isAny("noise")){
        decision.push({ "email": "INTRUDER_DETECTED_ALARM","record": "INTRUDER_DETECTED_ALARM" });
 	} 
-	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && isAny("grideye") && (pl != null && pl["humidity"] != undefined && pl["humidity"] >60) && (pl != null && pl["temperature"] != undefined && pl["temperature"] >30)){
+	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && isAny("grideye") && (pl != null && pl["humidity"] != undefined && pl["humidity"] >60) && (pl != null && pl["temperature"] != undefined && pl["temperature"] >30) && isAny("noise")){
        decision.push({ "email": "COIL_MAINTENANCE_ALARAM","record": "COIL_MAINTENANCE_ALARAM" });
+	} 
+	  if(isAny("co2") && isAny("tvoc") && isAny("acc_z") && isAny("grideye") && isAny("humidity") && isAny("temperature") && (pl != null && pl["noise"] != undefined && pl["noise"] >2000)){
+       decision.push({ "email": "NOISE_ALARM","record": "NOISE_ALARM" });
 	} 
 }
 //RULES EVALUATION END

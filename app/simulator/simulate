@@ -2,6 +2,16 @@ function randomIntFromInterval(min,max) {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
 
+var randy = function(bits){
+    var temp_25 = Math.floor((Math.random()*200-100)*4);
+    if (temp_25 > 0) {
+        return temp_25
+    }else{
+        // return complement
+        return (1<<bits)+temp_25
+    }
+}
+
 var data = {
     "id":"stwincompagno",
     "temperature": randomIntFromInterval(0,85),
@@ -20,11 +30,11 @@ var data = {
       "altitude":"1574.21"
      },
     "humidity": randomIntFromInterval(0,100),
-    "tvoc": randomIntFromInterval(0,60000),
+    "tvoc": randomIntFromInterval(0,500),
     "co2": randomIntFromInterval(0,40000),
     "pm": {pm10_0: randomIntFromInterval(0,500), pm2_5: randomIntFromInterval(0,500), pm1_0: randomIntFromInterval(0,500)},
-    "grideye": function() { var data = []; for(var i = 0; i < 64; i++) data.push(randomIntFromInterval(111,255)); return data.join(" ");}(),
-    "noise": randomIntFromInterval(0,140),
+    "grideye": function() { var data = []; for(var i = 0; i < 64; i++) data.push(randy(12)); return data.join(" ");}(),
+    "noise": randomIntFromInterval(0,5000),
 }
 
 publish("deviceDigest", data);

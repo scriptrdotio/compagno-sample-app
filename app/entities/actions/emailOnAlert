@@ -20,8 +20,8 @@ function execute(request, device, alertType){
 }
 
 function sendEmailForAlertType(request, device, toEmail, fromEmail, alertType) {
-    var subject = _.template(templates.getTemplate("mail", alertType).subject)(device);
-    var body = _.template(templates.getTemplate("mail", alertType).body)(device);
+    var subject = _.template(templates.getTemplate("mail", alertType, device).subject)(device);
+    var body = _.template(templates.getTemplate("mail", alertType, device).body)(device);
     log.info(toEmail+ " "+ fromEmail + " " + subject + " " + body)
     sendMail(toEmail, fromEmail, subject, body);
 }

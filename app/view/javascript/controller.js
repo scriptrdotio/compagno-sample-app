@@ -15,8 +15,8 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         {
             key: 'pressure',
             lat: 147, 
-            lng: 196,
-            draggable: false,
+            lng: 162,
+            draggable: true,
             icon: {
                 url: vm.icons["pressure"],
                 unit: 'hPa'
@@ -24,9 +24,9 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         },
         {
             key: 'temperature',
-            lat: 309, 
-            lng: 513,
-            draggable: false,
+            lat: 310, 
+            lng: 524,
+            draggable: true,
             icon: {
                 url: vm.icons["temperature"],
                 unit: '&deg;C'
@@ -34,9 +34,9 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         },
         {
             key: 'humidity',
-            lat: 309, 
-            lng: 738,
-            draggable: false,
+            lat: 310, 
+            lng: 743,
+            draggable: true,
             icon: {
                 url: vm.icons["humidity"],
                 unit: '%'
@@ -44,9 +44,9 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         },
         {
             key: 'co2',
-            lat: 131, 
-            lng: 581,
-            draggable: false,
+            lat: 130, 
+            lng: 633,
+            draggable: true,
             icon: {
                 url: vm.icons["co2"],
                 unit: 'ppm'
@@ -54,19 +54,19 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         },
         {
             key: 'tvoc',
-            lat: 131, 
-            lng: 496,
-            draggable: false,
+            lat: 130, 
+            lng: 529,
+            draggable: true,
             icon: {
                 url:  vm.icons["tvoc"],
-                unit: 'ppb'
+                unit: 'Index'
             }
         },
         {
             key: 'particulate',
-            lat: 131, 
-            lng: 409,
-            draggable: false,
+            lat: 130, 
+            lng: 422,
+            draggable: true,
             class: "large",
             icon: {
                 url: vm.icons["particulate"],
@@ -75,20 +75,20 @@ myApp.controller('mapCtrl', function($location, constants, $routeParams, dataSer
         }, 
         {
             key: 'vibration',
-            lat: 194, 
-            lng: 77,
-            draggable: false,
+            lat: 218, 
+            lng: 76,
+            draggable: true,
             class: "large",
             icon: {
                 url: vm.icons["accelerometer"],
-                unit: 'mg'
+                unit: 'g'
             }
         },
         {
             key: 'noise',
             lat: 320, 
-            lng: 194,
-            draggable: false,
+            lng: 180,
+            draggable: true,
             icon: {
                 url: vm.icons["noise"],
                 unit: 'db'
@@ -437,7 +437,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
                "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
                "min": 0,
                "max": 60000,
-               "symbol":"ppb",
+               "symbol":"Index",
                "size": {sizeX: 2, sizeY: 3 },
                "type": "gauge"
         	},
@@ -447,7 +447,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
                "formatFunction": function(data, self) { return vm.noiseFormatData(data, self) },
                "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
                "min": 0,
-               "max": 140,
+               "max": 50000,
                "symbol":"db",
                "size": {sizeX: 2, sizeY: 3 },//, col: 1, row: 3 },
                "type": "gauge"
@@ -535,7 +535,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         
             {
                "key": "acc_x",
-               "label": "Acceleration X",
+               "label": "Acceleration X (g)",
                "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
                "size": {sizeX: 2, sizeY: 1 },
                "noHeader": true,
@@ -543,7 +543,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         	},
              {
                "key": "acc_y",
-               "label": "Acceleration Y",
+               "label": "Acceleration Y (g)",
                "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
                "size": {sizeX: 2, sizeY: 1 },
                "noHeader": true,
@@ -551,7 +551,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         	},
              {
                "key": "acc_z",
-               "label": "Acceleration Z",
+               "label": "Acceleration Z (g)",
                "formatFunction":  function(data, self) { return vm.accXFormatData(data, self) },
                "size": {sizeX: 2, sizeY: 1 },
                "noHeader": true,
@@ -657,7 +657,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         {
            "key": "tvoc",
            "label": "TVOC",
-           "colorsMapping": [{"labels":"TVOC","colors":"#ad7fa8","axisSelection":"y","unit":"ppb"}],
+           "colorsMapping": [{"labels":"TVOC","colors":"#ad7fa8","axisSelection":"y","unit":"Index"}],
            "apiParams": {
                 "query": [
                     {
@@ -687,7 +687,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
         {
            "key": "acceleration",
            "label": "Acceleration",
-           "colorsMapping": [{"labels":"Acc X","colors":"#ad7fa8","axisSelection":"y","unit":"mg"},{"labels":"Acc Y","colors":"#e25b3c","axisSelection":"y","unit":"mg"},{"labels":"Acc Z","colors":"#c8d106","axisSelection":"y","unit":"mg"}],
+           "colorsMapping": [{"labels":"Acc X","colors":"#ad7fa8","axisSelection":"y","unit":"g"},{"labels":"Acc Y","colors":"#e25b3c","axisSelection":"y","unit":"g"},{"labels":"Acc Z","colors":"#c8d106","axisSelection":"y","unit":"g"}],
            "apiParams": {
                 "query": [
                     {
