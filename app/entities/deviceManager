@@ -45,26 +45,7 @@ function getDeviceAlertsEntries(id) {
         return null;
    }
 }
-/**
- * @function listHistory
- * @param {String} id: the device's id
- * @return {ArrayList} list of historical device data
- */
-function getDeviceHistoricalEntries(id) {
-   var key = event_prefix + id;;
-   
-   var params = {
-       "query" : "key like \""+key+"_%\"",
-       "fields": "*"
-   }
-   
-   var result = document.query(params);
-   if(result.metadata.status == "success" && result.result.documents.length > 0) {
-        return result.result.documents;
-   } else {
-        return null;
-   }
-}
+
 
 function buildDeviceEventDocument(entry, data) {
     _.extendOwn(entry, data);
@@ -151,4 +132,108 @@ function getDevicesHistoricalSensorsEntries(devices, sensors) {
    } else {
         return null;
    }
+}
+
+
+/**
+ * @function listHistory
+ * @param {String} id: the device's id
+ * @return {ArrayList} list of historical device data
+ */
+/**function getDeviceHistoricalEntries(id) {
+   var key = event_prefix + id;;
+   
+   var params = {
+       "query" : "key like \""+key+"_%\"",
+       "fields": "*"
+   }
+   
+   var result = document.query(params);
+   if(result.metadata.status == "success" && result.result.documents.length > 0) {
+        return result.result.documents;
+   } else {
+        return null;
+   }
+} **/
+
+function getDeviceHistoricalEntries(id, recordCount, startTime, endTime, descSorting) {
+  var key = event_prefix + id;
+
+  var query = "key like \""+key+"_%\"";
+
+  if(startTime) {
+    query += " AND creationDate<numeric> >= "+startTime;
+  }
+
+  if(endTime) {
+    query += " AND creationDate<numeric> <= "+endTime+" ";
+  }
+
+  var maxAllowedResultsPerPage = 50;
+  var params = {
+    "query" : query,
+    "fields": "*",
+    "count": true,
+    "sort": descSorting ? "creationDate<date:DESC>" : "creationDate<date:ASC>",
+    "resultsPerPage": maxAllowedResultsPerPage //Maximum allowed number of results [50]
+  }
+  log.info("[app/entities/deviceManager] params\n"+JSON.stringify(params));
+  var pageCounter = 1;
+  var continueLoop = true;
+
+  var documents = [];
+
+  while(continueLoop){
+    params["pageNumber"] = pageCounter;
+
+    if(recordCount && recordCount < maxAllowedResultsPerPage){
+      params["resultsPerPage"] = recordCount;
+    } 
+
+    if(recordCount && documents.length >= recordCount) {
+      continueLoop = false;
+      continue;
+    }
+
+    if(documents.length < recordCount && recordCount < documents.length + params["resultsPerPage"]) {
+      params["resultsPerPage"] = recordCount - documents.length;
+    }
+
+    var result = document.query(params);
+    log.info("[app/entities/deviceManager] result\n"+JSON.stringify(result));
+
+    if(result.metadata.status == "success") {
+      if(result.result && result.result.documents && result.result.documents.length == 0) {
+        continueLoop = false;
+        continue;
+      }
+      pageCounter++;
+      documents = _.union(documents, result.result.documents);
+
+    } else {
+      continueLoop = false;
+      continue;
+    }
+  }
+
+  return documents;
+
+}
+
+
+function getAllDeviceLatestPayload(id) {
+  var key = event_prefix + id;
+  var params = {
+    "query" : "key like \""+key+"_%\"",
+    "fields": "creationDate",
+    "sort": "creationDate<date:DESC>",
+    "resultsPerPage": 1
+  }
+
+  var result = document.query(params);
+  if(result.metadata.status == "success" && result.result.documents.length > 0) {
+    return result.result.documents[0];
+  } else {
+    return null;
+  }
 }
