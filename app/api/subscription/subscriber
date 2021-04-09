@@ -50,8 +50,8 @@ log.info("[app/api/subscription/subscriber] transform the payload into \n" + JSO
 if(!_.isEmpty(data)) { 
     try {
         var deviceDefinition = deviceManager.getDeviceDefinition(deviceId);
-        log.info("Existing Device Definition: "+JSON.stringify(deviceDefinition))
-        if(deviceDefinition == null || (data.lat && !isNaN(parseFloat(data.lat))  && data.long && !isNaN(parseFloat(data.long))  && data.gps_accuracy && !isNaN(parseFloat(data.gps_accuracy)) &&  parseFloat(data.gps_accuracy) <=  1.5)) {
+        log.info("Existing Device Definition: "+JSON.stringify(deviceDefinition))        
+        if(deviceDefinition == null || deviceDefinition.sensor == null || (data.lat && !isNaN(parseFloat(data.lat))  && data.long && !isNaN(parseFloat(data.long))  && data.gps_accuracy && !isNaN(parseFloat(data.gps_accuracy)) &&  parseFloat(data.gps_accuracy) <=  1.5)) {
             var deviceDefinition = {};
             
             _.extend(config.deviceDataTopUp, utils.randomGeo({"lat": config.deviceDataTopUp.lat, "lng": config.deviceDataTopUp.long}, 2000));

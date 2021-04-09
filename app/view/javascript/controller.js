@@ -393,7 +393,7 @@ myApp.controller('dashboardCtrl', function($scope,  wsClient, httpClient, $route
                "levelColors": ["#1e79da","#fce94f","#fcaf3e","#d93b3b", "#a00649"],
                "min": 0,
                "max": 85,
-               "symbol":"μg/m3",
+               "symbol":"℃",
                "size": {sizeX: 2, sizeY: 3 },
                "type": "gauge"
         	},

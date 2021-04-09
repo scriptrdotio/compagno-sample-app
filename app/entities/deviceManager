@@ -53,6 +53,7 @@ function buildDeviceEventDocument(entry, data) {
     delete entry.versionNumber;
     delete entry.latest;
     delete entry.creator;
+    delete entry["apsdb.update"];
 
     entry["event_type"] = ["event"];
     entry["key"] = event_prefix + entry.id + "_" + new Date().getTime();
